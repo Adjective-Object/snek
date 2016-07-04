@@ -1,0 +1,8 @@
+repos
+store
+cache
+*.swp
+*.swo
+*.pyc
+logs
+result-*
