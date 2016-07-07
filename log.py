@@ -40,7 +40,7 @@ def log_append(handle, attr_path, blob):
     for a in attr_path[:-1]:
         if a not in current.keys():
             current[a] = {}
-            current = current[a]
+        current = current[a]
 
     if attr_path[-1] not in current:
         current[attr_path[-1]] = ''

@@ -23,10 +23,11 @@ def validate_params(schema):
     return decorator
 
 def get_repo_by_url(repo_url):
-    print config.repos
     for k, v in config.repos.iteritems():
         if v['url'] == repo_url:
             return k
     return None
 
-
+def mkdir_p(path):
+    if not os.path.exists(path):
+        os.makedirs(path)

@@ -1,112 +1,190 @@
-from log import log_add, log_append
-import subprocess, threading
-import os
+from log import log_add, log_append, log_content
+import subprocess, threading, os, time, re
 from config import config
+from util import mkdir_p
 
 ongoing_builds = set()
 
-def is_build_ongoing(repo):
-    return repo in ongoing_builds
+def append_builds(handle, *attr_path):
+    def log(out, err):
+        log_append(handle, attr_path, out)
+        log_append(handle, attr_path, err)
+    return log
 
-# perform some process while saving things to the log
-def log_proc(cmd, handle, *attr_path, **kwargs):
+# Helper: perform some process while saving things to the log
+def proc(cmd, handle, logging_callback, **kwargs):
     kwargs['stdout'] = subprocess.PIPE
     kwargs['stderr'] = subprocess.PIPE
-    print cmd, kwargs
+
     # build the cache from the store
     proc = subprocess.Popen(
             cmd,
             **kwargs
             )
-   
+  
+    # TODO deinterleave this maybe
     while proc.poll() is None:
         out = proc.stdout.readline()
         err = proc.stderr.readline()
-        log_append(handle, attr_path, out);
-        log_append(handle, attr_path, err);
+
+        logging_callback(out, err)
 
     out, err = proc.communicate()
-    log_append(handle, attr_path, out);
-    log_append(handle, attr_path, err);
+    logging_callback(out, err)
 
     return proc.returncode;
 
-# perform a build and log to fs
-def build_proc(repo_name, build_handle):
-    repo = config.repos[repo_name]
 
-    ongoing_builds.add(repo_name);
-    repo = config.repos[repo_name]
+class Build(object):
+    def __init__(self, repo_id):
+        self.repo_id = repo_id
+        self.repo = config.repos[repo_id]
 
-    # make folders for repo and cache
-    repo_path  = os.path.join(config.paths.repos, repo_name)
-    cache_path = os.path.join(config.paths.repos, repo_name)
-    store_path = config.paths.store # shared store
+    ##################
+    # static methods #
+    ##################
 
-    log_add(build_handle);
+    @staticmethod
+    def is_ongoing(handle):
+        return handle in ongoing_builds
 
-    def mkdir_p(path):
-        if not os.path.exists(path):
-            os.makedirs(path)
-    mkdir_p(repo_path)
-    mkdir_p(cache_path)
-    mkdir_p(store_path)
+    @staticmethod
+    def from_log(build_id):
+        build_log = log_content(build_id)
+        if not build_log:
+            return None
 
-    # clone the git repo if it doesn't exist,
-    if not os.path.exists(os.path.join(repo_path, '.git')):
-        exitcode = log_proc(
-            ['git', 'clone', repo['url'], repo_path],
-            build_handle,
-            'fetch'
+        b = Build(build_log["repo_id"])
+        b._load_build_from_log(build_log)
+        return b
+
+    ###################
+    # THE BUILD STEPS #
+    ###################
+
+    def prep_folders(self):
+        # make folders for repo and cache
+        self.repo_path  = os.path.abspath(
+                os.path.join(config.paths.repos, self.repo_id))
+        self.cache_path = os.path.abspath(
+                os.path.join(config.paths.cache, self.repo_id))
+        self.store_path = os.path.abspath(config.paths.store) # shared store
+       
+        mkdir_p(self.repo_path)
+        mkdir_p(self.cache_path)
+        mkdir_p(self.store_path)
+
+    def build_step_fetch_source(self):
+        # clone the git repo if it doesn't exist,
+        if not os.path.exists(os.path.join(self.repo_path, '.git')):
+            exitcode = proc(
+                ['git', 'clone', self.repo['url'], self.repo_path],
+                self.handle,
+                append_builds(self.handle, 'fetch')
+            )
+        # otherwise pull to update it (TODO: allow specific version request)
+        else:
+            exitcode = proc(
+                ['git', 'pull'],
+                self.handle,
+                append_builds(self.handle, 'fetch'),
+                cwd=self.repo_path
+            )
+
+        return exitcode
+ 
+    def build_step_list_packages(self):
+        repo_nix_entry = os.path.join(self.repo_path, 'default.nix')
+        exitcode = proc(
+                ['nix-env', '-qaP', '-f', repo_nix_entry],
+                self.handle,
+                append_builds(self.handle, 'list_packages'),
+                cwd=self.repo_path)
+
+        if exitcode:
+            return exitcode
+
+        # split on repeated spaces, remove empty strings, take every other
+        package_str = log_content(self.handle)['list_packages']
+        self.packages = filter(lambda x: x!= '', re.split('\\s+', package_str))[::2]
+
+
+    def build_step_build_package(self, pkg):
+        # reusable env override
+        nix_env_override = (
+            'NIX_STORE_DIR=%s ' % (self.store_path) +
+            'NIX_PATH=nixpkgs=%s:$NIX_PATH ' % (self.repo.nixpkgs)
         )
 
-    # otherwise pull to update it (TODO: allow specific version request)
-    else:
-        exitcode = log_proc(
-            ['git', 'pull'],
-            build_handle,
-            'fetch',
-            cwd=repo_path
+        # build it
+        exitcode = proc(
+            nix_env_override +
+            'nix-build --no-out-link %s/default.nix' % (self.repo_path),
+            self.handle,
+            append_builds(self.handle, 'packages', pkg, 'build'),
+            shell=True
         )
-    if exitcode:
-        ongoing_builds.remove(repo_name)
-        return
-
-    exitcode = log_proc(
-        'NIX_STORE_DIR=%s ' % (store_path) +
-        'NIX_PATH=nixpkgs=%s:$NIX_PATH ' % (repo.nixpkgs) +
-        'nix-build %s/default.nix' % (repo_path),
-        build_handle,
-        'build',
-        shell=True
-    )
-    if exitcode:
-        ongoing_builds.remove(repo_name)
-        return
-
-    exitcode = log_proc(
-        ['./build-cache.sh', repo_path, cache_path, store_path],
-        build_handle,
-        'cache'
-    )
-    if exitcode:
-        ongoing_builds.remove(repo_name)
-        return
-
-
-    # remove this job from the ongoing jobs
-    ongoing_builds.remove(repo_name)
-
-def build_start(repo, build_handle):
-    t = threading.Thread(
-            target=build_proc,
-            args=(repo, build_handle)
+        if exitcode:
+            return exitcode
+       
+        # fetch from something
+        exitcode = proc(
+            nix_env_override +
+            './nix-lookup %s/default.nix %s' % (self.repo_path, pkg),
+            self.handle,
+            append_builds(self.handle, 'packages', pkg, 'lookup'),
+            shell=True
         )
-    t.start()
+        if exitcode:
+            return exitcode
 
-    return {
-        'repo': repo,
-        'handle': build_handle,
-        'steps': ['fetch', 'build', 'cache']
-    }
+        # lookup from cache (todo not pls)
+        pkg_path = log_content(self.handle)['packages'][pkg]['lookup'].strip()
 
+        # ??
+        return proc(
+            ['nix-push', pkg_path, '--dest', self.cache_path],
+            self.handle,
+            append_builds(self.handle, 'packages', pkg, 'cache')
+        )
+
+    def build(self):
+        self.handle = "%s-%s" % (self.repo_id, int(time.time()))
+        threading.Thread(target=self._build).start()
+
+    def _build(self):
+        ongoing_builds.add(self.handle)
+ 
+        # add an entry for this specific build to the log
+        log_add(self.handle);
+    
+        # prep the folders        
+        self.prep_folders()
+
+        # clone & exit on failure
+        if self.build_step_fetch_source():
+            ongoing_builds.remove(self.handle)
+            return
+
+        # list processes & exit on failure
+        if self.build_step_list_packages():
+            ongoing_builds.remove(self.handle)
+            return
+
+        # build each of the packages
+        for pkg_path in self.packages:
+            self.build_step_build_package(pkg_path)
+
+        # remove this job from the ongoing jobs
+        ongoing_builds.remove(self.handle)
+    
+    #######################
+    # POST-BUILD QUERYING #
+    #######################
+
+    def _load_build_from_log(self, log):
+        self.packages = list(log["pkgs"].keys())
+
+    def get_package_statuses(self):
+        # TODO
+        return []

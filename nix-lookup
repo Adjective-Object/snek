@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+EXPR="\"\${(import $1 {}).$2}\""
+nix-instantiate --eval -E "${EXPR}" | sed 's:"::g'
+
