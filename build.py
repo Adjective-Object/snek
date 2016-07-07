@@ -9,7 +9,7 @@ def is_build_ongoing(repo):
     return repo in ongoing_builds
 
 # perform some process while saving things to the log
-def log_proc(cmd, handle, step, **kwargs):
+def log_proc(cmd, handle, *attr_path, **kwargs):
     kwargs['stdout'] = subprocess.PIPE
     kwargs['stderr'] = subprocess.PIPE
     print cmd, kwargs
@@ -22,12 +22,12 @@ def log_proc(cmd, handle, step, **kwargs):
     while proc.poll() is None:
         out = proc.stdout.readline()
         err = proc.stderr.readline()
-        log_append(handle, step, out);
-        log_append(handle, step, err);
+        log_append(handle, attr_path, out);
+        log_append(handle, attr_path, err);
 
     out, err = proc.communicate()
-    log_append(handle, step, out);
-    log_append(handle, step, err);
+    log_append(handle, attr_path, out);
+    log_append(handle, attr_path, err);
 
     return proc.returncode;
 
@@ -36,12 +36,12 @@ def build_proc(repo_name, build_handle):
     repo = config.repos[repo_name]
 
     ongoing_builds.add(repo_name);
-    repo = config.repos(repo_name)
+    repo = config.repos[repo_name]
 
     # make folders for repo and cache
-    repo_path  = os.path.join(conf.repose, repo_name)
-    cache_path = os.path.join(conf.cache, repo_name)
-    store_path = STORE_ROOT # shared store
+    repo_path  = os.path.join(config.paths.repos, repo_name)
+    cache_path = os.path.join(config.paths.repos, repo_name)
+    store_path = config.paths.store # shared store
 
     log_add(build_handle);
 

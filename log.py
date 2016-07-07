@@ -7,11 +7,11 @@ from config import config
 build_log = {}
 
 def log_path(handle):
-    return os.path.join(config.logs, handle)
+    return os.path.join(config.paths.logs, handle)
 
 def log_exists(handle):
     return (handle in build_log.keys() or 
-            os.path.isfile(os.path.join(config.logs, handle))
+            os.path.isfile(os.path.join(config.paths.logs, handle))
             )
 
 def log_dump(handle):
@@ -32,20 +32,27 @@ def log_content(handle):
 
 def log_add(handle):
     build_log[handle] = {}
+
     log_dump(handle)
 
-def log_append(handle, section, blob):
-    if section not in build_log[handle].keys():
-        build_log[handle][section] = ''
+def log_append(handle, attr_path, blob):
+    current = build_log[handle]
+    for a in attr_path[:-1]:
+        if a not in current.keys():
+            current[a] = {}
+            current = current[a]
 
-    build_log[handle][section] += blob
+    if attr_path[-1] not in current:
+        current[attr_path[-1]] = ''
+
+    current[attr_path[-1]] += blob
     log_dump(handle)
 
-def log_set_status(handle, status, msg=None):
+def log_set_status(handle, package, status, msg=None):
     build_log[handle]['status'] = {
-            'state': status,
-            'msg': msg 
-            }
+        'state': status,
+        'msg': msg 
+    }
 
     log_dump(handle)
 
