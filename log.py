@@ -1,5 +1,5 @@
 import os, json
-from config import LOG_DIR
+from config import config
 
 # Basic log interface functions
 # =============================
@@ -7,11 +7,11 @@ from config import LOG_DIR
 build_log = {}
 
 def log_path(handle):
-    return os.path.join(LOG_DIR, handle)
+    return os.path.join(config.logs, handle)
 
 def log_exists(handle):
     return (handle in build_log.keys() or 
-            os.path.isfile(os.path.join(LOG_DIR, handle))
+            os.path.isfile(os.path.join(config.logs, handle))
             )
 
 def log_dump(handle):

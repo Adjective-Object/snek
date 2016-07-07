@@ -1,7 +1,7 @@
 from functools import wraps
 from voluptuous import *
 from flask import request, jsonify
-from config import REPO_WHITELIST
+from config import config
 
 ###########
 # Helpers #
@@ -22,8 +22,8 @@ def validate_params(schema):
         return wrapper
     return decorator
 
-def get_whitelist_key(repo_url):
-    for k, v in REPO_WHITELIST.iteritems():
+def get_repo_by_url(repo_url):
+    for k, v in config.repos.iteritems():
         if v['url'] == repo_url:
             return k
     return None

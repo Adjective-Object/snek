@@ -1,12 +1,7 @@
 from log import log_add, log_append
 import subprocess, threading
 import os
-
-from config import (
-    REPO_ROOT, CACHE_ROOT,
-    STORE_ROOT, NIXPKGS_PATH,
-    REPO_WHITELIST
-    )
+from config import config
 
 ongoing_builds = set()
 
@@ -37,17 +32,18 @@ def log_proc(cmd, handle, step, **kwargs):
     return proc.returncode;
 
 # perform a build and log to fs
-def build_proc(key, handle):
-    ongoing_builds.add(key);
+def build_proc(repo_name, build_handle):
+    repo = config.repos[repo_name]
 
-    repo = REPO_WHITELIST[key];
+    ongoing_builds.add(repo_name);
+    repo = config.repos(repo_name)
 
     # make folders for repo and cache
-    repo_path  = os.path.join(REPO_ROOT,  key)
-    cache_path = os.path.join(CACHE_ROOT, key)
+    repo_path  = os.path.join(conf.repose, repo_name)
+    cache_path = os.path.join(conf.cache, repo_name)
     store_path = STORE_ROOT # shared store
 
-    log_add(handle);
+    log_add(build_handle);
 
     def mkdir_p(path):
         if not os.path.exists(path):
@@ -60,7 +56,7 @@ def build_proc(key, handle):
     if not os.path.exists(os.path.join(repo_path, '.git')):
         exitcode = log_proc(
             ['git', 'clone', repo['url'], repo_path],
-            handle,
+            build_handle,
             'fetch'
         )
 
@@ -68,49 +64,49 @@ def build_proc(key, handle):
     else:
         exitcode = log_proc(
             ['git', 'pull'],
-            handle,
+            build_handle,
             'fetch',
             cwd=repo_path
         )
     if exitcode:
-        ongoing_builds.remove(key)
+        ongoing_builds.remove(repo_name)
         return
 
     exitcode = log_proc(
         'NIX_STORE_DIR=%s ' % (store_path) +
-        'NIX_PATH=nixpkgs=%s:$NIX_PATH ' % (NIXPKGS_PATH) +
+        'NIX_PATH=nixpkgs=%s:$NIX_PATH ' % (repo.nixpkgs) +
         'nix-build %s/default.nix' % (repo_path),
-        handle,
+        build_handle,
         'build',
         shell=True
     )
     if exitcode:
-        ongoing_builds.remove(key)
+        ongoing_builds.remove(repo_name)
         return
 
     exitcode = log_proc(
         ['./build-cache.sh', repo_path, cache_path, store_path],
-        handle,
+        build_handle,
         'cache'
     )
     if exitcode:
-        ongoing_builds.remove(key)
+        ongoing_builds.remove(repo_name)
         return
 
 
     # remove this job from the ongoing jobs
-    ongoing_builds.remove(key)
+    ongoing_builds.remove(repo_name)
 
-def build_start(repo, handle):
+def build_start(repo, build_handle):
     t = threading.Thread(
             target=build_proc,
-            args=(repo, handle)
+            args=(repo, build_handle)
         )
     t.start()
 
     return {
         'repo': repo,
-        'handle': handle,
+        'handle': build_handle,
         'steps': ['fetch', 'build', 'cache']
     }
 

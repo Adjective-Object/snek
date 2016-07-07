@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 def _build(git_repo_url):
     # check if the build is on the whitelist
-    repo = get_whitelist_key(git_repo_url)
+    repo = get_repo_by_url(git_repo_url)
 
     if not repo:
         return errjson(
