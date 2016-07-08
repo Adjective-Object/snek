@@ -1,4 +1,8 @@
 {
+    "app_config": {
+        "host": "0.0.0.0",
+        "debug": true
+    },
     "paths": {
         "store": "/nix/store",
         "repos": "./repos",
