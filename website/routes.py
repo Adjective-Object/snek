@@ -8,7 +8,7 @@ public_dir = os.path.join(
         )
 
 @blueprint.route('/', methods=['GET'], defaults={'approute': ''})
-@blueprint.route('/<approute>', methods=['GET'])
+@blueprint.route('/<path:approute>', methods=['GET'])
 def get_index(approute=None):
     print approute
     return send_from_directory(public_dir, 'index.html')

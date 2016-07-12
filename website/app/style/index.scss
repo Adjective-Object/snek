@@ -1,0 +1,152 @@
+@import 'font-awesome.scss';
+
+$trans-time-fast: 0.1s;
+$trans-time-med: 0.3s;
+
+*, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html, #react-host, #app-root, #site-nav, #page {
+    height: 100%;
+}
+
+#app-root {
+    display: flex;
+    align-items: stretch;
+    flex-direction: row;
+
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+#site-nav {
+    background-color: #0F8C75;
+    color: white;
+
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+
+    padding: 2em;
+
+    overflow-y: auto;
+
+    a:before {
+        content: "\f054";
+        font-size: 0.5em;
+        font-family: FontAwesome;
+        position: absolute;
+        left: -1em;
+        top: 50%;
+        margin-top: -0.5em;
+        display: inline-block;
+
+        transition: transform   $trans-time-med,
+                    opacity     $trans-time-med;
+    }
+
+    a:not(.active):before {
+        opacity:0;
+        transform: translate(0.5em, 0);
+    }
+    a.active:before {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+
+    a {
+        color: white;
+        &:not(:hover) { opacity: 0.6;   }
+        &:hover       { opacity: 0.8;   }
+        &:active      { opacity: 1;     }
+
+        transition: opacity $trans-time-fast;
+
+        display: block;
+        position: relative;
+        margin-bottom: 0.2em;
+
+        text-decoration: none;
+        &:after {
+            content: "";
+            width: 100%;
+            height: 1px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+
+            background-color: white;
+
+            transition: transform $trans-time-fast;
+        }
+        &:not(:hover):after { transform: scale(0,1);  }
+        &:hover:after       { transform: scale(1,1);  }
+
+    }
+
+    a[href='/'] {
+        color: #084C46;
+        font-size: 2em;
+
+        &:after{ display: none; }
+
+        width: 100%;
+
+    }
+
+    a[href='/about'] {
+        margin-top: auto;
+        margin-bottom: 0;
+    }
+
+    hr {
+        border: none;
+        outline: none;
+        height: 1em;
+    }
+}
+
+#page {
+    flex-grow: 1;
+    position: relative;
+
+    overflow: hidden;
+
+    & > div {
+
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        transform: translate(0, 0);
+
+        overflow: auto;
+
+        padding: 2em;
+
+        &.page-enter {
+            opacity: 0;
+            transform: translate(0, -32px);
+            transition: opacity     $trans-time-med,
+                        transform   $trans-time-med;
+        }
+        &.page-enter-active {
+            opacity: 1;
+            transform: translate(0, 0);
+        }
+        &.page-leave {
+            opacity: 1;
+            transform: translate(0, 0);
+            transition: opacity     $trans-time-med,
+                        transform   $trans-time-med;
+        }
+        &.page-leave-active {
+            opacity: 0;
+            transform: translate(0, 32px);
+        }
+    }
+
+}

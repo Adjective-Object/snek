@@ -6,8 +6,59 @@ export default class AboutPage extends Component {
             <div>
                 <h1>About</h1>
                 <p>
-                    The About page
+                    The About page is supposed to have information
+                    about snek (e.g. github page, license)
                 </p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
+                <p>The About page</p>
             </div>
         )
     }

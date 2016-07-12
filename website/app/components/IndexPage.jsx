@@ -6,7 +6,8 @@ export default class IndexPage extends Component {
             <div>
                 <h1>Index</h1>
                 <p>
-                    the index page
+                    This page should show overall project health
+                    and recent changes to project health                   
                 </p>
             </div>
         )

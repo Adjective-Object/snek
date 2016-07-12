@@ -3,7 +3,7 @@ var path = require('path');
 
 module.exports = {
 	entry: [
-		'./app/index.jsx' // Your appʼs entry point
+		'./app/index.jsx'
 	],
 	devtool: process.env.WEBPACK_DEVTOOL || 'source-map',
 	output: {
@@ -22,6 +22,11 @@ module.exports = {
                 query: {
                     presets: ['es2015', 'react']
                 }
+            },
+            {
+                test: /(\.scss?|\.scss?)$/,
+                exclude: /(node_modules|bower_components)/,
+                loaders: ["style", "css?sourceMap", "sass?sourceMap"]
             }
         ],
 	},
@@ -31,6 +36,7 @@ module.exports = {
 			hot: true,
 			inline: true
     },
+    devtool: "#inline-source-map",
     plugins: [
 		new webpack.NoErrorsPlugin(),
 	]
