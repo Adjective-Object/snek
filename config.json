@@ -11,7 +11,7 @@
     },
     "repos": {
         "nix-pkgs-personal": {
-            "name": "nix-pkgs-personal on github",
+            "name": "personal nix packages",
             "url": "git://github.com/Adjective-Object/nix-pkgs-personal.git",
             "nixpkgs" : "/home/adjective/.nix-defexpr/channels/nixpkgs"
         }

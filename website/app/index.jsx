@@ -34,14 +34,40 @@ const store = createStore(
 )
 
 class _App extends Component {
+  
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      direction: 'down'
+    }
+
+    this._figureOrder = this._figureOrder.bind(this)
+  }
+
+  _figureOrder(evt) {
+    let clickedElement = evt.nativeEvent.target;
+    let activeElement = 
+      document.querySelector('#site-nav .active')
+
+    if (activeElement &&
+        (document.DOCUMENT_POSITION_PRECEDING & 
+         activeElement.compareDocumentPosition(clickedElement))) {
+      this.setState({direction: 'up'});
+    } else {
+      this.setState({direction: 'down'});
+    }
+  }
+
   render() {
-    let repoLinks = [];
+    let repoLinks = []
     for (let key in this.props.repos) {
       console.log(key);
       repoLinks.push(
         <Link activeClassName="active" 
               to={"/repos/" + key}
-              key={key}>
+              key={key}
+              onClick={this._figureOrder}>
           {this.props.repos[key].name}
         </Link>
       );
@@ -50,19 +76,26 @@ class _App extends Component {
     return (
       <div id="app-root">
         <nav id="site-nav">
-          <Link to="/">Snek</Link>
+          <Link to="/"
+                onClick={this._figureOrder}
+                >
+                Snek
+          </Link>
           {repoLinks}
-          <hr/>
-          <Link activeClassName="active" to="/about">About</Link>
-
+          <Link activeClassName="active"
+                to="/about"
+                onClick={this._figureOrder}
+                >
+                About
+          </Link>
         </nav>
 
         <ReactCSSTransitionGroup
           component="div"
           id="page"
-          transitionName="page"
-          transitionEnterTimeout={500}
-          transitionLeaveTimeout={500}
+          transitionName={`page-slide-${this.state.direction}`}
+          transitionEnterTimeout={300}
+          transitionLeaveTimeout={300}
         >
           {React.cloneElement(this.props.children, {
             key: location.pathname
@@ -103,8 +136,10 @@ const Application = ({ children, location }) => {
   );
 }
 
-store.dispatch(fetchRepoList())
-  .then(() => console.log(store.getState()))
+setTimeout(() => {
+  store.dispatch(fetchRepoList())
+    .then(() => console.log(store.getState()))  
+}, 400);
 
 render((
   <Provider store={store}>

@@ -1,5 +1,6 @@
 import _ from 'underscore';
 import {
+    NETWORK_STATE_NONE,
     NETWORK_STATE_REQUESTING,
     NETWORK_STATE_FAILURE,
     NETWORK_STATE_SUCCESS,
@@ -7,9 +8,8 @@ import {
 } from '../actions/actions.jsx'
 
 export const defaultState = {
-    repos: {
-
-    },
+    repos: {},
+    networkState: {},
     logs: {}
 }
 
@@ -22,22 +22,26 @@ let snekApp = (state=initialState, action) => {
     }
 }
 
+let networkHandler = (handler) =>
+    (state, action) => {
+        let newState = handler(state, action)
+        newState.networkState[action.type] = action.network
+        return newState
+    }
+
 let responses = {
-    FETCH_REPO_LIST: (state, action) => {
+    FETCH_REPO_LIST: networkHandler((state, action) => {
         switch(action.network) {
             case NETWORK_STATE_REQUESTING:
                 return _(state).clone()
             case NETWORK_STATE_FAILURE:
                 return _(state).clone()
             case NETWORK_STATE_SUCCESS:
-                let newState = {
-                    logs: state.logs,
-                    repos: state.repos = 
-                        _(action.responseBody).extend(state.repos)
-                }
+                let newState = _(state).clone()
+                newState.repos =  _(action.responseBody).extend(state.repos)
                 return newState;
         }
-    },
+    }),
 
     default: (state, action) => _(state).clone()
 }
