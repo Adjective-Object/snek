@@ -1,3 +1,5 @@
+import { log, err, warn } from './util'
+
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
@@ -12,7 +14,7 @@ import AboutPage from './components/AboutPage'
 import RepoPage from './components/RepoPage'
 import RepoListPage from './components/RepoListPage'
 
-import { fetchRepoList } from './actions/actions.jsx'
+import * as actions from './actions/actions.jsx'
 
 import './style/index.scss'
 
@@ -62,7 +64,6 @@ class _App extends Component {
   render() {
     let repoLinks = []
     for (let key in this.props.repos) {
-      console.log(key);
       repoLinks.push(
         <Link activeClassName="active" 
               to={"/repos/" + key}
@@ -108,7 +109,6 @@ class _App extends Component {
 
 const App = connect(
   state => {
-    console.log(state);
     return {
       repos: state.repos,
     }
@@ -128,17 +128,26 @@ const Application = ({ children, location }) => {
     <Router history={browserHistory}>
       <Route path="/" component={App}>
         <IndexRoute component={IndexPage}/>
-        <Route path="repos" component={RepoListPage} />
-        <Route path="repos/:repoId" component={RepoPage} />
+        <Route path="repos" component={RepoListPage} 
+                onEnter={ (nextState) => 
+                  store.dispatch(
+                    actions.fetchRepoList()
+                  )
+                } />
+        <Route path="repos/:repoId" component={RepoPage}
+                onEnter={ (nextState) =>
+                  store.dispatch(
+                    actions.fetchRepoDetails(nextState.params.repoId)
+                  )
+                }/>
         <Route path="about" component={AboutPage} />
-      </Route>  
+      </Route>
     </Router>
   );
 }
 
 setTimeout(() => {
-  store.dispatch(fetchRepoList())
-    .then(() => console.log(store.getState()))  
+  store.dispatch(actions.fetchRepoList())
 }, 400);
 
 render((

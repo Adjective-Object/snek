@@ -1,8 +1,18 @@
+# directories from default config file
 repos
 store
 cache
+status
+logs
+
+# compilation results
+result*
+*.pyc
+
+# vim
 *.swp
 *.swo
-*.pyc
-logs
-result-*
+
+# sublime
+*.sublime-project
+*.sublime-workspace

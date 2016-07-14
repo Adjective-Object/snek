@@ -1,4 +1,4 @@
-from log import log_add, log_append, log_content
+from log import log, status
 import subprocess, threading, os, time, re
 from config import config
 from util import mkdir_p
@@ -6,10 +6,10 @@ from util import mkdir_p
 ongoing_builds = set()
 
 def append_builds(handle, *attr_path):
-    def log(out, err):
-        log_append(handle, attr_path, out)
-        log_append(handle, attr_path, err)
-    return log
+    def write_log(out, err):
+        log.append(handle, attr_path, out)
+        log.append(handle, attr_path, err)
+    return write_log
 
 # Helper: perform some process while saving things to the log
 def proc(cmd, handle, logging_callback, **kwargs):
@@ -50,7 +50,7 @@ class Build(object):
 
     @staticmethod
     def from_log(build_id):
-        build_log = log_content(build_id)
+        build_log = log.content(build_id)
         if not build_log:
             return None
 
@@ -105,7 +105,7 @@ class Build(object):
             return exitcode
 
         # split on repeated spaces, remove empty strings, take every other
-        package_str = log_content(self.handle)['list_packages']
+        package_str = log.content(self.handle)['list_packages']
         self.packages = filter(lambda x: x!= '', re.split('\\s+', package_str))[::2]
 
 
@@ -139,7 +139,7 @@ class Build(object):
             return exitcode
 
         # lookup from cache (todo not pls)
-        pkg_path = log_content(self.handle)['packages'][pkg]['lookup'].strip()
+        pkg_path = log.content(self.handle)['packages'][pkg]['lookup'].strip()
 
         # ??
         return proc(
@@ -149,15 +149,19 @@ class Build(object):
         )
 
     def build(self):
-        self.handle = "%s-%s" % (self.repo_id, int(time.time()))
+        self.build_time = int(time.time())
+        self.handle = "%s-%s" % (self.repo_id, self.build_time)
         threading.Thread(target=self._build).start()
 
     def _build(self):
         ongoing_builds.add(self.handle)
- 
+
         # add an entry for this specific build to the log
-        log_add(self.handle);
-    
+        log.init(self.handle);
+        if (not status.exists(self.repo_id)):
+            status.init(self.repo_id)
+        status.add_build(self.repo_id, self.handle, self.build_time)
+
         # prep the folders        
         self.prep_folders()
 
@@ -171,9 +175,28 @@ class Build(object):
             ongoing_builds.remove(self.handle)
             return
 
+        status.add_packages(self.repo_id, self.handle, self.packages)
+
         # build each of the packages
         for pkg_path in self.packages:
-            self.build_step_build_package(pkg_path)
+            status.update_package_status(
+                self.repo_id,
+                self.handle,
+                pkg_path,
+                'ongoing'
+                )
+            if (self.build_step_build_package(pkg_path)):
+                status.update_package_status(
+                    self.repo_id,
+                    self.handle,
+                    pkg_path,
+                    'failure')
+            else:
+                status.update_package_status(
+                    self.repo_id,
+                    self.handle,
+                    pkg_path,
+                    'success')
 
         # remove this job from the ongoing jobs
         ongoing_builds.remove(self.handle)

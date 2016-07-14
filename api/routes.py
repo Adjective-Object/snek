@@ -4,7 +4,7 @@ import time
 import json
 
 from build import Build
-from log import log_list, log_exists, log_content
+from log import log, status
 from util import *
 
 from config import config
@@ -20,6 +20,17 @@ blueprint = Blueprint('api', __name__)
 def get_repos():
     return json.dumps(config.repos)
 
+# get details on a given repo
+@blueprint.route('/repos/<repo_id>', methods=['GET'])
+def get_repo(repo_id):
+
+    if repo_id not in config.repos.keys():
+        return errjson("repo %s does not exist" % repo_id)
+
+    if not status.exists(repo_id):
+        status.init(repo_id)
+
+    return json.dumps(status.content(repo_id))
 
 # get list of builds
 @blueprint.route('/builds', methods=['GET'])
@@ -30,7 +41,7 @@ def get_repos():
 def get_builds():
     #TODO: paginate
     #TODO: allow filter by active
-    return jsonify(log_list())
+    return jsonify(log.list())
 
 #request a build
 @blueprint.route('/builds', methods=['POST'])
@@ -45,7 +56,7 @@ def post_builds():
     """
     repo_id = request.values['repo_id']
     if not repo_id:
-        return errjson('build not on whitelist')
+        return errjson('%s not on whitelist' % repo_id)
     elif Build.is_ongoing(repo_id):
         return errjson('build for %s already underway' % repo_id)
     else:
@@ -78,7 +89,7 @@ def get_build_status(build_id):
 
 @blueprint.route('/builds/<build_id>/<package_name>', methods=['GET'])
 def get_package_status_in_build(build_id, package_name):
-    build = log_get_build(build_id)
+    build = log.get_build(build_id)
     if not build:
         return errjson('build not found'), 404
 

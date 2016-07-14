@@ -7,13 +7,20 @@
         "store": "/nix/store",
         "repos": "./repos",
         "cache": "./cache",
-        "logs": "./logs"
+        "logs": "./logs",
+        "status": "./status"
     },
     "repos": {
         "nix-pkgs-personal": {
             "name": "personal nix packages",
             "url": "git://github.com/Adjective-Object/nix-pkgs-personal.git",
             "nixpkgs" : "/home/adjective/.nix-defexpr/channels/nixpkgs"
+        },
+        "nix-pkgs-personal-2": {
+            "name": "copy of nix ppa",
+            "url": "git://github.com/Adjective-Object/nix-pkgs-personal.git",
+            "nixpkgs" : "/home/adjective/.nix-defexpr/channels/nixpkgs"
         }
+
     }
 }

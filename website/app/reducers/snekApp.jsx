@@ -1,3 +1,4 @@
+import { log, err, warn } from '../util';
 import _ from 'underscore';
 import {
     NETWORK_STATE_NONE,
@@ -17,7 +18,7 @@ let snekApp = (state=initialState, action) => {
     if (responses.hasOwnProperty(action.type)) {
         return responses[action.type](state, action)
     } else {
-        console.log('defaulting!')
+        warn('defaulting', action.type)
         return responses.default(state, action)
     }
 }
@@ -29,6 +30,7 @@ let networkHandler = (handler) =>
         return newState
     }
 
+let identity = (state, action) => _(state).clone()
 let responses = {
     FETCH_REPO_LIST: networkHandler((state, action) => {
         switch(action.network) {
@@ -43,7 +45,8 @@ let responses = {
         }
     }),
 
-    default: (state, action) => _(state).clone()
+    '@@redux/INIT': identity,
+    default: identity
 }
 
 export default snekApp
