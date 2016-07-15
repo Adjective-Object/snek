@@ -1,5 +1,4 @@
 import { log, err, warn } from '../util';
-import _ from 'underscore';
 import {
     NETWORK_STATE_NONE,
     NETWORK_STATE_REQUESTING,
@@ -8,8 +7,11 @@ import {
     FETCH_REPO_LIST,
 } from '../actions/actions.jsx'
 
+import _ from 'underscore';
+
 export const defaultState = {
     repos: {},
+    details: {},
     networkState: {},
     logs: {}
 }
@@ -35,12 +37,23 @@ let responses = {
     FETCH_REPO_LIST: networkHandler((state, action) => {
         switch(action.network) {
             case NETWORK_STATE_REQUESTING:
-                return _(state).clone()
             case NETWORK_STATE_FAILURE:
                 return _(state).clone()
             case NETWORK_STATE_SUCCESS:
                 let newState = _(state).clone()
                 newState.repos =  _(action.responseBody).extend(state.repos)
+                return newState;
+        }
+    }),
+
+    FETCH_REPO_DETAILS: networkHandler((state, action) => {
+        switch(action.network) {
+            case NETWORK_STATE_REQUESTING:
+            case NETWORK_STATE_FAILURE:
+                return _(state).clone()
+            case NETWORK_STATE_SUCCESS:
+                let newState = _(state).clone()
+                newState.details[action.repo] = action.responseBody
                 return newState;
         }
     }),

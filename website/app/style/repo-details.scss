@@ -1,0 +1,35 @@
+.packageStatusView {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+
+    padding: 1em;
+    margin: 1em;
+
+    max-width: 400px;
+
+    h2 {
+        margin-bottom: 0.5em;
+    }
+
+    .package:not(:last-child) {
+        margin-bottom: 0.25em;
+    }
+
+    .package {
+        display: flex;
+
+        .package-name {
+        }
+
+        .package-status {
+            text-align: right;
+            flex-grow: 1;
+        }
+
+        .package-status.success     { color: #0F8C75; }
+        .package-status.failure     { color: #BF535D; }
+        .package-status.in-progress { color: #15346E; }
+        .package-status.unstarted   { color: #48544F; }
+    }
+
+}

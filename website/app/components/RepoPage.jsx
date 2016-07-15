@@ -1,50 +1,52 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
+import { tryPath } from '../util'
 
 import {
     FETCH_REPO_LIST,
+    FETCH_REPO_DETAILS,
     NETWORK_STATE_NONE,
     NETWORK_STATE_REQUESTING,
     NETWORK_STATE_FAILURE,
     NETWORK_STATE_SUCCESS
 } from '../actions/actions'
 
+import RepoPageDetails from './RepoPageDetails'
+
+
 class _RepoPage extends Component {
     render() {
-        let params = this.props.params;
-        let repoId = params && params['repoId'];
-        let repo = this.props.repos[repoId];
-
-        if (repo) {
+        if (this.props.repo) {
             // render repo if it exists
-            return this.renderMainScreen(repo)
+            return this.renderMainScreen()
         } else if (
-            this.props.networkState === NETWORK_STATE_REQUESTING) {
+            this.props.networkStateRepoList === NETWORK_STATE_REQUESTING) {
             // if we are requesting the list, render a loader
             return this.renderLoadScreen()
         } else if (
-            this.props.networkState === NETWORK_STATE_FAILURE) {
+            this.props.networkStateRepoList === NETWORK_STATE_FAILURE) {
             // if we failed to load the repo list, render an err
             return this.renderFailScreen()
         } else if (
-            this.props.networkState === NETWORK_STATE_SUCCESS) {
+            this.props.networkStateRepoList === NETWORK_STATE_SUCCESS) {
             // if we got a list of repos and the current repo is not on that
             // list, render an error page.
             return this.renderMissingScreen()
         } else if (
-            this.props.networkState === NETWORK_STATE_NONE) {
+            this.props.networkStateRepoList === NETWORK_STATE_NONE) {
             // if we got a list of repos and the current repo is not on that
             // list, render an error page.
             return this.renderLoadScreen()
         }
     }
 
-    renderMainScreen(repo) {
+    renderMainScreen() {
+        let detailPage = (this.props.repoDetails)
+                ? <RepoPageDetails repoDetails={ this.props.repoDetails } />
+                : <p>Loading details..</p>;
         return <div>
-            <h1> { repo.name } </h1>
-            <p>
-                { "Content for page goes here" }
-            </p>
+            <h1> { this.props.repo.name } </h1>
+            { detailPage }
         </div>
     }
 
@@ -52,7 +54,7 @@ class _RepoPage extends Component {
         return <div>
             <h1> Loading .. </h1>
             <p>
-                { "Content for page will go here" }
+                Just hold on a minute!
             </p>
         </div>
     }
@@ -61,7 +63,7 @@ class _RepoPage extends Component {
         return <div>
             <h1> Failure! </h1>
             <p>
-                { "Failed to fetch from server" }
+                Failed to fetch from server :(
             </p>
         </div>
     }
@@ -78,10 +80,25 @@ class _RepoPage extends Component {
 }
 
 let RepoPage = connect(
-    state => {
+    (state, ownProps) => {
         return {
-            repos: state.repos,
-            networkState : state.networkState[FETCH_REPO_LIST] || NETWORK_STATE_NONE
+            repo: tryPath(
+                state.repos,
+                [ ownProps.params.repoId ]
+                ),
+
+            repoDetails: tryPath(
+                state.details, 
+                [ ownProps.params.repoId ]
+                ),
+
+            networkStateRepoList: 
+                state.networkState[FETCH_REPO_LIST] || 
+                NETWORK_STATE_NONE,
+
+            networkStateRepoDetails: 
+                state.networkState[FETCH_REPO_DETAILS] ||
+                NETWORK_STATE_NONE
         }
     },
     dispatch => {

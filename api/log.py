@@ -13,7 +13,7 @@ class FsStore(object):
     # check if handle exists already
     def exists(self, handle):
         return (handle in self.build_log.keys() or 
-                os.path.isfile(os.path.join(config.paths.logs, handle))
+                os.path.isfile(self.path(handle))
                 )
 
     # dump to filesystem
@@ -65,16 +65,18 @@ class FsRepoStatus(FsStore):
     # initialize 
     def init(self, repo):
         self.build_log[repo] = {
-            "log-entries": {},
+            "log_entries": {},
+            "latest_build": None
         }
         self.dump(repo)
 
     def add_build(self, repo, build_id, build_time):
-        self.build_log[repo]["log-entries"][build_id] = {
+        self.build_log[repo]["log_entries"][build_id] = {
             "time": build_time,
-            "build-status": "in-progress",
-            "package-status": {}
+            "build_status": "in-progress",
+            "package_status": {}
         }
+        self.build_log[repo]["latest_build"] = build_id
         self.dump(repo)
 
     def add_packages(self, repo, build, packages):
@@ -84,16 +86,19 @@ class FsRepoStatus(FsStore):
                 "status": "unstarted"
             }
 
-        self.build_log[repo]["log-entries"
-            ][build]["package-status"] = blank_statuses
+        self.build_log[repo]["log_entries"
+            ][build]["package_status"] = blank_statuses
         self.dump(repo)
 
     def update_package_status(self, repo, build, package, status):
-        self.build_log[repo]["log-entries"
-            ][build]["package-status"][package] = {
+        self.build_log[repo]["log_entries"
+            ][build]["package_status"][package] = {
             "status": status
         }
         self.dump(repo)
+
+    def finish(self, repo, build):
+        self.build_log[repo]["build_status"] = "finished";
 
 
 log     = FsBuildLog(lambda handle: os.path.join(config.paths.logs, handle))

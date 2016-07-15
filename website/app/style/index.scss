@@ -1,4 +1,5 @@
 @import 'font-awesome.scss';
+@import 'repo-details.scss';
 
 $trans-time-fast: 0.1s;
 $trans-time-med: 0.3s;
@@ -116,6 +117,7 @@ body, html, #react-host, #app-root, #site-nav, #page {
     overflow: hidden;
 
     min-width: 400px;
+    
     margin-left:auto;
     margin-right: auto;
 
@@ -129,7 +131,6 @@ body, html, #react-host, #app-root, #site-nav, #page {
         transform: translate(0, 0);
 
         overflow: auto;
-
 
         padding: 2em;
 
@@ -171,22 +172,4 @@ body, html, #react-host, #app-root, #site-nav, #page {
 
     }
 
-}
-
-@media screen and (max-width: 600px) {
-    #page {
-        max-width: 600px;
-    }
-}
-
-@media screen and (min-width: 601px) and (max-width: 1200px) {
-    #page {
-        max-width: 800px;
-    }
-}
-
-@media screen and (min-width: 1201px) and (max-width: 1600px) {
-    #page {
-        max-width: 1200px;
-    }
 }
