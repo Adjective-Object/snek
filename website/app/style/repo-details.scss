@@ -12,6 +12,10 @@
     &[data-state="ongoing"]:hover, &[data-state="ongoing"].visible {border-color: #263B6E;}
     &[data-state="failure"]:hover, &[data-state="failure"].visible {border-color: #BF535D;}
 
+    &.visible .build-short-summary .build-hash:before {
+        transform: rotate(90deg);
+    }
+
     .build-short-summary {
         position: relative;
 
@@ -22,6 +26,18 @@
 
         .build-hash {
             font-weight: bold;
+            &:before {
+                position: relative;
+                top: -0.1em;
+                margin-right: 0.5em;
+                display: inline-block;
+                content: '\f054';
+                font-family: 'FontAwesome';
+                font-size: 0.7em;
+                vertical-align: middle;
+
+                transition: transform 0.2s;
+            }
         }
 
         time {
@@ -93,7 +109,7 @@
 
                     transition: opacity 0.3s, max-width 0.3s;
                 }
- 
+
                 transition: color 0.3s;
                 &:hover {
                     color: white;
@@ -103,7 +119,7 @@
                     opacity: 1;
                     max-width: 300px;
                 }
- 
+
             }
 
             .status-success { background-color: #0F8C75; }
@@ -148,7 +164,7 @@
         }
 
         padding-left: 0.5em;
-        padding-right: 0.5em;   
+        padding-right: 0.5em;
     }
 
     .repo-details.visible .package {

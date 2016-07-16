@@ -97,13 +97,19 @@ class RepoPageBuildDisplay extends Component {
 		}
 
 		return (
-			<div className="packageStatusView"
-				data-state={currentBuildState}
-				onClick={() => this.setState({
-					visible: !this.state.visible
-				})}>
+			<div className={
+				this.state.visible
+					? "visible packageStatusView"
+					: "packageStatusView"}
 
-				<div className="build-short-summary">
+				data-state={currentBuildState}
+				>
+
+				<div className="build-short-summary"
+					onClick={() => this.setState({
+						visible: !this.state.visible
+					})}>
+					
 					<PackageStatus pkgStates={pkgStates}/>
 					<PastTimer dateTime={buildTime} />
 
@@ -116,7 +122,7 @@ class RepoPageBuildDisplay extends Component {
 
 						{ build.git 
 							? build.git.msg
-							: 'holde up a sec..' }
+							: 'hold up a sec..' }
 					</div>
 
 				</div>
