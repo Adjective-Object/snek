@@ -1,44 +1,21 @@
 import React, { Component } from 'react'
-
-function readableTimeDifference(t) {
-	let d = Date.now() - t
-	let second = 1000
-	let minute = second * 60
-	let hour = minute * 60
-	let day = hour * 24
-	if (d > day) {
-		let count = Math.floor(d/day)
-		return count + ' day' 	 + (count == 1 ? ' ago' : 's ago')
-	} else if (d > hour) {
-		let count = Math.floor(d/hour)
-		return count + ' hour' 	 + (count == 1 ? ' ago' : 's ago')
-	} else if (d > minute) {
-		let count = Math.floor(d/minute)
-		return count +  ' minute' + (count == 1 ? ' ago' : 's ago')
-	} else if (d > second) {
-		let count = Math.floor(d/second)
-		return count +  ' second' + (count == 1 ? ' ago' : 's ago')
-	}
-}
+import PastTimer from './PastTimer'
 
 let RepoPageBuildDetails = (props) => {
-	let build = props.build
-
-	console.log(props)
 
 	// build list of package statuses
 	let packageStatuses = [];
-	let packages = build.package_status;
+	let packages = props.build.package_status
 	for (let pkg in packages) {
-		packageStatuses.push(<div className="package" key={pkg}>
-			<span className="package-name">{pkg}</span>
-			<span className={`package-status ${packages[pkg].status}`}>
-				{packages[pkg].status}
-			</span>
-		</div>)
+		packageStatuses.push(
+			<div className="package" key={pkg}>
+				<span className="package-name">{pkg}</span>
+				<span className={`package-status ${packages[pkg].status}`}>
+					{packages[pkg].status}
+				</span>
+			</div>
+			)
 	}
-
-	console.log(props);
 
 	return (
 		<div className={props.visible
@@ -48,6 +25,42 @@ let RepoPageBuildDetails = (props) => {
 			{packageStatuses}
 		</div>
 		)
+
+}
+
+let PackageStatus = (props) => {
+
+	let pkgStates = {
+		success: 0,
+		ongoing: 0,
+		unstarted: 0,
+		failure: 0,
+	}
+
+	for (let pkg in props.build.package_status) {
+		let status = props.build.package_status[pkg].status
+		pkgStates[status]++
+	}
+
+	pkgStates.ongoing = pkgStates.ongoing + pkgStates.unstarted;
+	delete pkgStates.unstarted;
+
+	let states = [];
+	for (let pkgState in pkgStates) {
+		states.push(
+			<span 
+				className={'status-' + pkgState}
+				key={pkgState}
+				>
+				{pkgStates[pkgState]}
+			</span>
+			)
+	}
+
+	return <span className='package-build-summary'>
+		{ states }
+	</span>
+
 
 }
 
@@ -73,17 +86,17 @@ class RepoPageBuildDisplay extends Component {
 				})}>
 
 				<div className="build-short-summary">
-					<time dateTime={buildTime.toISOString()}>
-						{readableTimeDifference(buildTime)}
-					</time>
-
-					<span className="build-hash">
-						{build.git.revision.substring(0,8)}
-					</span>
+					<PackageStatus build={build}/>
+					<PastTimer dateTime={buildTime} />
 
 					<p className='description'>
+						<h2 className="build-hash">
+							{build.git.revision.substring(0,8)}
+						</h2>
+
 						{ build.git.msg }
 					</p>
+
 				</div>
 
 				<RepoPageBuildDetails 
@@ -117,8 +130,6 @@ export default class RepoPageDetails extends Component {
 					build={ repoDetails.log_entries[key] } />
 				)
 		}
-
-		console.log(repoDetails.log_entries)
 
 		return (
 			<div>

@@ -2,26 +2,92 @@
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 2px;
 
-    padding: 1em;
     margin-top: 1em;
     margin-bottom: 1em;
 
     max-width: 400px;
 
+
     .build-short-summary {
+        position: relative;
+
+        display: flex;
+        justify-content: stretch;
+        min-height: 100px;
+        $padding: 1em;
+
         .build-hash {
             font-weight: bold;
-
         }
 
         time {
             font-style: italic;
             margin-left: auto;
             float: right;
+
+            position: absolute;
+            top: $padding;
+            right: $padding;
         }
 
         .description {
+            padding: $padding;
             opacity: 0.8;
+        }
+
+        .package-build-summary {
+            width: 3em;
+            flex-shrink: 0;
+
+            & > * {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                color: rgba(255, 255, 255, 0.5);
+                height: 33%;
+
+                &:first-child {
+                    height: 34%;
+                }
+
+                &:before {
+                    font-size: 0.6em;
+                    font-family: 'FontAwesome';
+                    margin-right: 0.5em;
+                }
+
+                &:after {
+                    display: block;
+                    opacity: 0;
+                    max-width: 0;
+                    overflow: hidden;
+                    white-space: nowrap;
+                }
+ 
+                &:hover {
+                    color: white;
+                }
+
+                &:hover:after {
+                    opacity: 1;
+                    max-width: 100%;
+                }
+ 
+            }
+
+            .status-success { background-color: #0F8C75; }
+            .status-failure { background-color: #BF535D; }
+            .status-ongoing { background-color: #263B6E; }
+
+            .status-success:before { content: '\f00c'; }
+            .status-failure:before { content: '\f00d'; }
+            .status-ongoing:before { content: '\f017'; }
+
+            .status-success:after { content: ' builds have succeeded'; }
+            .status-failure:after { content: ' builds have failed'; }
+            .status-ongoing:after { content: ' builds are incomplete'; }
+
         }
     }
 
@@ -41,15 +107,19 @@
         transition: height 0.2s, opacity 0.2s, margin-top 0.2s;
 
         will-change: contents;
+
+        &:nth-child(2n) {
+            background-color: #EFEFEF;
+        }
+
+        padding-left: 0.5em;
+        padding-right: 0.5em;   
     }
 
     .repo-details.visible .package {
         opacity: 1;
-        height: 1em;
-        &:not(:last-child) { height: 1.25em; }
-    }
-    .repo-details.visible .package:first-of-type {
-        margin-top: 1em;
+        height: 2em;
+        line-height: 2em;
     }
     .repo-details:not(.visible) .package {
         height: 0;
