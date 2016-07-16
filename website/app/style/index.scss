@@ -173,3 +173,31 @@ body, html, #react-host, #app-root, #site-nav, #page {
     }
 
 }
+
+.markdown-container > div{
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+
+    h1, h2, h3, h4, h5, h6 { 
+        &:not(:first-child) {
+            margin-top: 0.5em
+        }
+    }
+
+    p + p {
+        margin-top: 0.5em;
+    }
+
+    p {
+        display: flex
+    }
+
+    img {
+        align-self: center;
+        max-height: 15em;
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}

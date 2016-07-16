@@ -27,7 +27,11 @@ module.exports = {
                 test: /(\.scss?|\.scss?)$/,
                 exclude: /(node_modules|bower_components)/,
                 loaders: ["style", "css?sourceMap", "sass?sourceMap"]
-            }
+            },
+            {
+            	test: /\.md$/,
+            	loader: "jsx-loader!imports?React=react!html-jsx-loader!markdown"
+            },
         ],
 	},
 	devServer: {

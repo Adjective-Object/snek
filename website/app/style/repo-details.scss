@@ -8,6 +8,10 @@
     max-width: 400px;
 
 
+    &[data-state="success"]:hover, &[data-state="success"].visible {border-color: #0F8C75;}
+    &[data-state="ongoing"]:hover, &[data-state="ongoing"].visible {border-color: #263B6E;}
+    &[data-state="failure"]:hover, &[data-state="failure"].visible {border-color: #BF535D;}
+
     .build-short-summary {
         position: relative;
 
@@ -36,20 +40,29 @@
         }
 
         .package-build-summary {
-            width: 3em;
+            $bs-width: 3.5em;
+            width: $bs-width;
             flex-shrink: 0;
+            position: relative;
 
             & > * {
                 display: flex;
-                justify-content: center;
+                justify-content: flex-start;
                 align-items: center;
 
                 color: rgba(255, 255, 255, 0.5);
+                position: relative;
                 height: 33%;
+                min-width: $bs-width;
 
-                &:first-child {
+                padding-left: 1em;
+                padding-right: 1em;
+
+
+                &:last-child {
                     height: 34%;
                 }
+
 
                 &:before {
                     font-size: 0.6em;
@@ -58,20 +71,37 @@
                 }
 
                 &:after {
-                    display: block;
+                    z-index: 100;
+                    position: absolute;
+                    top: 0;
+                    left: 100%;
+                    margin-left: -1em;
+
+                    background-color: inherit;
+                    height: 100%;
+
+                    padding-left: 0.2em;
+                    padding-right: 0.5em;
+
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
                     opacity: 0;
                     max-width: 0;
                     overflow: hidden;
                     white-space: nowrap;
+
+                    transition: opacity 0.3s, max-width 0.3s;
                 }
  
+                transition: color 0.3s;
                 &:hover {
                     color: white;
                 }
 
                 &:hover:after {
                     opacity: 1;
-                    max-width: 100%;
+                    max-width: 300px;
                 }
  
             }
@@ -80,13 +110,17 @@
             .status-failure { background-color: #BF535D; }
             .status-ongoing { background-color: #263B6E; }
 
+            // .status-success[data-count="0"] { background-color: desaturate(lighten(#0F8C75, 20%), 90%); }
+            // .status-failure[data-count="0"] { background-color: desaturate(lighten(#BF535D, 20%), 90%); }
+            // .status-ongoing[data-count="0"] { background-color: desaturate(lighten(#263B6E, 20%), 90%); }
+
             .status-success:before { content: '\f00c'; }
             .status-failure:before { content: '\f00d'; }
             .status-ongoing:before { content: '\f017'; }
 
-            .status-success:after { content: ' builds have succeeded'; }
-            .status-failure:after { content: ' builds have failed'; }
-            .status-ongoing:after { content: ' builds are incomplete'; }
+            .status-success:after { content: 'package builds have succeeded'; }
+            .status-failure:after { content: 'package builds have failed'; }
+            .status-ongoing:after { content: 'package builds are incomplete'; }
 
         }
     }
@@ -104,11 +138,12 @@
         .package-status.ongoing     { color: #15346E; }
         .package-status.unstarted   { color: #48544F; }
 
-        transition: height 0.2s, opacity 0.2s, margin-top 0.2s;
+        transition: height 0.2s, opacity 0.2s, line-height 0.2s;
+        line-height: 1em;
 
-        will-change: contents;
+        will-change: auto;
 
-        &:nth-child(2n) {
+        &:nth-child(2n+1) {
             background-color: #EFEFEF;
         }
 

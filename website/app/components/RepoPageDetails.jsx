@@ -28,8 +28,7 @@ let RepoPageBuildDetails = (props) => {
 
 }
 
-let PackageStatus = (props) => {
-
+let getPkgStateCounts = (packageStates) => {
 	let pkgStates = {
 		success: 0,
 		ongoing: 0,
@@ -37,22 +36,30 @@ let PackageStatus = (props) => {
 		failure: 0,
 	}
 
-	for (let pkg in props.build.package_status) {
-		let status = props.build.package_status[pkg].status
+	for (let pkg in packageStates) {
+		let status = packageStates[pkg].status
 		pkgStates[status]++
 	}
 
 	pkgStates.ongoing = pkgStates.ongoing + pkgStates.unstarted;
 	delete pkgStates.unstarted;
 
+	return pkgStates;
+}
+
+let PackageStatus = (props) => {
+
 	let states = [];
-	for (let pkgState in pkgStates) {
+	for (let pkgState in props.pkgStates) {
 		states.push(
 			<span 
 				className={'status-' + pkgState}
 				key={pkgState}
+				data-count={
+					props.pkgStates[pkgState]
+				}
 				>
-				{pkgStates[pkgState]}
+				{props.pkgStates[pkgState]}
 			</span>
 			)
 	}
@@ -79,23 +86,38 @@ class RepoPageBuildDisplay extends Component {
 		let buildTime =
 			new Date(build.time * 1000)
 
+		let pkgStates = getPkgStateCounts(this.props.build.package_status)
+
+		let currentBuildState = 'ongoing';
+		for (let state of ['ongoing', 'failure', 'success']) {
+			if (pkgStates[state] != 0) {
+				currentBuildState = state;
+				break;
+			}
+		}
+
 		return (
 			<div className="packageStatusView"
+				data-state={currentBuildState}
 				onClick={() => this.setState({
 					visible: !this.state.visible
 				})}>
 
 				<div className="build-short-summary">
-					<PackageStatus build={build}/>
+					<PackageStatus pkgStates={pkgStates}/>
 					<PastTimer dateTime={buildTime} />
 
-					<p className='description'>
+					<div className='description'>
 						<h2 className="build-hash">
-							{build.git.revision.substring(0,8)}
+							{build.git 
+								? build.git.revision.substring(0,8)
+								: 'fetching..'}
 						</h2>
 
-						{ build.git.msg }
-					</p>
+						{ build.git 
+							? build.git.msg
+							: 'holde up a sec..' }
+					</div>
 
 				</div>
 
@@ -123,7 +145,7 @@ export default class RepoPageDetails extends Component {
 		let latestBuild = repoDetails.log_entries[latestBuildId]
 
 		let builds = []
-		for (let key in this.props.repoDetails.log_entries) {
+		for (let key of Object.keys(this.props.repoDetails.log_entries).sort().reverse()) {
 			builds.push(
 				<RepoPageBuildDisplay
 					key={ key }
@@ -134,9 +156,6 @@ export default class RepoPageDetails extends Component {
 		return (
 			<div>
 				{ builds }
-				<pre>
-				{ JSON.stringify(this.props.repoDetails, null, '    ') }
-				</pre>
 			</div>
 			)
 	}

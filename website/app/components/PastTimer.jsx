@@ -25,9 +25,9 @@ function timerResolution(t) {
 	let d = Date.now() - t
 	let second = 1000
 	let minute = second * 60
-	for (let diff of [10 * minute, 5 * minute, minute, 30 * second]) {
-		if (d > diff) {
-			return diff / 2;
+	for (let diff of [10 * minute, 5 * minute, minute]) {
+		if (d >= diff) {
+			return diff / 60;
 		}
 	}
 	return second / 2;
