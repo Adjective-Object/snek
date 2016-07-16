@@ -9,11 +9,19 @@
     max-width: 400px;
 
     .build-short-summary {
-        font-weight: bold;
-        display: flex;
+        .build-hash {
+            font-weight: bold;
+
+        }
 
         time {
-            margin-left: auto
+            font-style: italic;
+            margin-left: auto;
+            float: right;
+        }
+
+        .description {
+            opacity: 0.8;
         }
     }
 
@@ -30,7 +38,7 @@
         .package-status.ongoing     { color: #15346E; }
         .package-status.unstarted   { color: #48544F; }
 
-        transition: height 0.2s, opacity 0.2s;
+        transition: height 0.2s, opacity 0.2s, margin-top 0.2s;
 
         will-change: contents;
     }
@@ -39,6 +47,9 @@
         opacity: 1;
         height: 1em;
         &:not(:last-child) { height: 1.25em; }
+    }
+    .repo-details.visible .package:first-of-type {
+        margin-top: 1em;
     }
     .repo-details:not(.visible) .package {
         height: 0;

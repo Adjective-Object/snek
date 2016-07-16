@@ -15,8 +15,9 @@ function readableTimeDifference(t) {
 	} else if (d > minute) {
 		let count = Math.floor(d/minute)
 		return count +  ' minute' + (count == 1 ? ' ago' : 's ago')
-	} else {
-		return 'just now'
+	} else if (d > second) {
+		let count = Math.floor(d/second)
+		return count +  ' second' + (count == 1 ? ' ago' : 's ago')
 	}
 }
 
@@ -72,13 +73,17 @@ class RepoPageBuildDisplay extends Component {
 				})}>
 
 				<div className="build-short-summary">
+					<time dateTime={buildTime.toISOString()}>
+						{readableTimeDifference(buildTime)}
+					</time>
+
 					<span className="build-hash">
 						{build.git.revision.substring(0,8)}
 					</span>
 
-					<time dateTime={buildTime.toISOString()}>
-						{readableTimeDifference(buildTime)}
-					</time>
+					<p className='description'>
+						{ build.git.msg }
+					</p>
 				</div>
 
 				<RepoPageBuildDetails 
