@@ -3,23 +3,22 @@
     border-radius: 2px;
 
     padding: 1em;
-    margin: 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
 
     max-width: 400px;
 
-    h2 {
-        margin-bottom: 0.5em;
-    }
+    .build-short-summary {
+        font-weight: bold;
+        display: flex;
 
-    .package:not(:last-child) {
-        margin-bottom: 0.25em;
+        time {
+            margin-left: auto
+        }
     }
 
     .package {
         display: flex;
-
-        .package-name {
-        }
 
         .package-status {
             text-align: right;
@@ -28,8 +27,25 @@
 
         .package-status.success     { color: #0F8C75; }
         .package-status.failure     { color: #BF535D; }
-        .package-status.in-progress { color: #15346E; }
+        .package-status.ongoing     { color: #15346E; }
         .package-status.unstarted   { color: #48544F; }
+
+        transition: height 0.2s, opacity 0.2s;
+
+        will-change: contents;
     }
+
+    .repo-details.visible .package {
+        opacity: 1;
+        height: 1em;
+        &:not(:last-child) { height: 1.25em; }
+    }
+    .repo-details:not(.visible) .package {
+        height: 0;
+        opacity: 0;
+    }
+
+
+
 
 }

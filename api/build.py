@@ -6,10 +6,22 @@ from util import mkdir_p
 ongoing_builds = set()
 
 def append_builds(handle, *attr_path):
-    def write_log(out, err):
+    def write_log(out, err, done):
         log.append(handle, attr_path, out)
         log.append(handle, attr_path, err)
     return write_log
+
+def aggregate_with_callback(callback):
+    def aggregate(out, err, done):
+        aggregate.output += out
+        aggregate.error += err
+        if (done):
+            callback(aggregate.output, aggregate.error)
+
+    aggregate.output = ''
+    aggregate.error = ''
+
+    return aggregate
 
 # Helper: perform some process while saving things to the log
 def proc(cmd, handle, logging_callback, **kwargs):
@@ -27,10 +39,10 @@ def proc(cmd, handle, logging_callback, **kwargs):
         out = proc.stdout.readline()
         err = proc.stderr.readline()
 
-        logging_callback(out, err)
+        logging_callback(out, err, False)
 
     out, err = proc.communicate()
-    logging_callback(out, err)
+    logging_callback(out, err, True)
 
     return proc.returncode;
 
@@ -77,21 +89,36 @@ class Build(object):
     def build_step_fetch_source(self):
         # clone the git repo if it doesn't exist,
         if not os.path.exists(os.path.join(self.repo_path, '.git')):
-            exitcode = proc(
+            return proc(
                 ['git', 'clone', self.repo['url'], self.repo_path],
                 self.handle,
                 append_builds(self.handle, 'fetch')
             )
         # otherwise pull to update it (TODO: allow specific version request)
         else:
-            exitcode = proc(
+            return proc(
                 ['git', 'pull'],
                 self.handle,
                 append_builds(self.handle, 'fetch'),
                 cwd=self.repo_path
             )
 
-        return exitcode
+    def build_step_check_revision(self):
+        def assign_repo(out, err):
+            print out.split(' ', 1)
+            self.build_hash, self.commit_msg = out.split(' ', 1)
+            status.set_build_git_info(
+                self.repo_id,
+                self.handle,
+                self.build_hash,
+                self.commit_msg)
+
+        return proc(
+            ['git', 'log', '--pretty=oneline', 'HEAD~1..HEAD',],
+            self.handle,
+            aggregate_with_callback(assign_repo),
+            cwd=self.repo_path
+        )
  
     def build_step_list_packages(self):
         repo_nix_entry = os.path.join(self.repo_path, 'default.nix')
@@ -160,6 +187,7 @@ class Build(object):
         log.init(self.handle);
         if (not status.exists(self.repo_id)):
             status.init(self.repo_id)
+
         status.add_build(self.repo_id, self.handle, self.build_time)
 
         # prep the folders        
@@ -167,6 +195,11 @@ class Build(object):
 
         # clone & exit on failure
         if self.build_step_fetch_source():
+            ongoing_builds.remove(self.handle)
+            return
+
+        # check revision
+        if self.build_step_check_revision():
             ongoing_builds.remove(self.handle)
             return
 

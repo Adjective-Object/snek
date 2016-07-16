@@ -18,7 +18,7 @@ blueprint = Blueprint('api', __name__)
 # get list of repos
 @blueprint.route('/repos', methods=['GET'])
 def get_repos():
-    return json.dumps(config.repos)
+    return jsonify(config.repos)
 
 # get details on a given repo
 @blueprint.route('/repos/<repo_id>', methods=['GET'])
@@ -30,7 +30,7 @@ def get_repo(repo_id):
     if not status.exists(repo_id):
         status.init(repo_id)
 
-    return json.dumps(status.content(repo_id))
+    return jsonify(status.content(repo_id))
 
 # get list of builds
 @blueprint.route('/builds', methods=['GET'])

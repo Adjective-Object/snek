@@ -1,61 +1,127 @@
 import React, { Component } from 'react'
 
-class RepoPagePackageStatusView extends Component {
-	render() {
-		let packageStatuses = [];
-		let packages = this.props.packages;
-		for (let pkg in packages) {
-			console.log(pkg)
-			packageStatuses.push(<div className="package" key={pkg}>
-				<span className="package-name">{pkg}</span>
-				<span className={`package-status ${packages[pkg].status}`}>
-					{packages[pkg].status}
-				</span>
-			</div>)
-		}
-		return <div className="packageStatusView">
-			<h2> Latest Build </h2>
+function readableTimeDifference(t) {
+	let d = Date.now() - t
+	let second = 1000
+	let minute = second * 60
+	let hour = minute * 60
+	let day = hour * 24
+	if (d > day) {
+		let count = Math.floor(d/day)
+		return count + ' day' 	 + (count == 1 ? ' ago' : 's ago')
+	} else if (d > hour) {
+		let count = Math.floor(d/hour)
+		return count + ' hour' 	 + (count == 1 ? ' ago' : 's ago')
+	} else if (d > minute) {
+		let count = Math.floor(d/minute)
+		return count +  ' minute' + (count == 1 ? ' ago' : 's ago')
+	} else {
+		return 'just now'
+	}
+}
+
+let RepoPageBuildDetails = (props) => {
+	let build = props.build
+
+	console.log(props)
+
+	// build list of package statuses
+	let packageStatuses = [];
+	let packages = build.package_status;
+	for (let pkg in packages) {
+		packageStatuses.push(<div className="package" key={pkg}>
+			<span className="package-name">{pkg}</span>
+			<span className={`package-status ${packages[pkg].status}`}>
+				{packages[pkg].status}
+			</span>
+		</div>)
+	}
+
+	console.log(props);
+
+	return (
+		<div className={props.visible
+				? 'repo-details visible'
+				: 'repo-details'
+			}>
 			{packageStatuses}
 		</div>
-	}
+		)
+
 }
 
-class RepoPageHistoryView extends Component {
-	render() {
-		let build_summaries = []
-		let keys = Object.keys(this.props.buildHistory).sort()
-		for (let key of keys) {
-			let build = this.props.buildHistory[key];
-			build_summaries.push(<div>
-				<date>{build.time}</date>
-			</div>);
+class RepoPageBuildDisplay extends Component {
+
+	constructor(props) {
+		super(props)
+		this.state = {
+			visible: false
 		}
-		return <div>
-			{build_summaries}
-		</div>
+	}
+
+	render() {
+		let build = this.props.build
+
+		let buildTime =
+			new Date(build.time * 1000)
+
+		return (
+			<div className="packageStatusView"
+				onClick={() => this.setState({
+					visible: !this.state.visible
+				})}>
+
+				<div className="build-short-summary">
+					<span className="build-hash">
+						{build.git.revision.substring(0,8)}
+					</span>
+
+					<time dateTime={buildTime.toISOString()}>
+						{readableTimeDifference(buildTime)}
+					</time>
+				</div>
+
+				<RepoPageBuildDetails 
+					build={build}
+					visible={this.state.visible}/>
+
+			</div>
+			)
 
 	}
 }
 
+// page
 export default class RepoPageDetails extends Component {
 	render() {
 		let repoDetails = this.props.repoDetails
-		let latestBuild = repoDetails.latest_build
-		if (! latestBuild) {
+		let latestBuildId = repoDetails.latest_build
+		if (! latestBuildId) {
 			return <div>
 				No builds have been performed
 			</div>
 		}
-		let latestPackageStatus = 
-			repoDetails.log_entries[latestBuild].package_status
 
-		return <div>
-			<RepoPagePackageStatusView packages={ latestPackageStatus } />
+		let latestBuild = repoDetails.log_entries[latestBuildId]
 
-			<RepoPageHistoryView buildHistory={ repoDetails.log_entries } />
-			<pre>
-			{ JSON.stringify(this.props.repoDetails, null, '    ') }
-			</pre>
-		</div>
+		let builds = []
+		for (let key in this.props.repoDetails.log_entries) {
+			builds.push(
+				<RepoPageBuildDisplay
+					key={ key }
+					build={ repoDetails.log_entries[key] } />
+				)
+		}
+
+		console.log(repoDetails.log_entries)
+
+		return (
+			<div>
+				{ builds }
+				<pre>
+				{ JSON.stringify(this.props.repoDetails, null, '    ') }
+				</pre>
+			</div>
+			)
 	}
 }

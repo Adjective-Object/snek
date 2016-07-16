@@ -79,6 +79,13 @@ class FsRepoStatus(FsStore):
         self.build_log[repo]["latest_build"] = build_id
         self.dump(repo)
 
+    def set_build_git_info(self, repo, build_id, revision, msg):
+        self.build_log[repo]["log_entries"][build_id]['git'] = {
+            'revision': revision,
+            'msg': msg
+        }
+        self.dump(repo)
+
     def add_packages(self, repo, build, packages):
         blank_statuses = {}
         for package in packages:
@@ -101,5 +108,5 @@ class FsRepoStatus(FsStore):
         self.build_log[repo]["build_status"] = "finished";
 
 
-log     = FsBuildLog(lambda handle: os.path.join(config.paths.logs, handle))
-status  = FsRepoStatus(lambda handle: os.path.join(config.paths.status, handle))
+log     = FsBuildLog(lambda handle: os.path.join(config.paths.logs, handle + '.json'))
+status  = FsRepoStatus(lambda handle: os.path.join(config.paths.status, handle + '.json'))
