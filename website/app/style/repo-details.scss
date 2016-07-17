@@ -24,6 +24,8 @@
         min-height: 100px;
         $padding: 1em;
 
+        cursor: pointer;
+
         .build-hash {
             font-weight: bold;
             &:before {
@@ -134,9 +136,9 @@
             .status-failure:before { content: '\f00d'; }
             .status-ongoing:before { content: '\f017'; }
 
-            .status-success:after { content: 'package builds have succeeded'; }
-            .status-failure:after { content: 'package builds have failed'; }
-            .status-ongoing:after { content: 'package builds are incomplete'; }
+            .status-success:after {content: 'package builds have succeeded'; }
+            .status-failure:after {content: 'package builds have failed'; }
+            .status-ongoing:after {content: 'package builds are incomplete'; }
 
         }
     }
@@ -153,6 +155,19 @@
         .package-status.failure     { color: #BF535D; }
         .package-status.ongoing     { color: #15346E; }
         .package-status.unstarted   { color: #48544F; }
+
+        .package-status.success:before      { content: '\f00c'; }
+        .package-status.failure:before      { content: '\f00d'; }
+        .package-status.ongoing:before      { content: '\f017'; }
+        .package-status.unstarted:before    { content: '\f141'; }
+
+        .package-status:before {
+            font-family: 'FontAwesome';
+            font-size: 0.7em;
+            position: relative;
+            top: -0.05em;
+            margin-right: 0.5em;
+        }
 
         transition: height 0.2s, opacity 0.2s, line-height 0.2s;
         line-height: 1em;
