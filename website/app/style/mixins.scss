@@ -1,0 +1,27 @@
+
+$trans-time-fast: 0.1s;
+$trans-time-med: 0.3s;
+
+@mixin fancy-underline($color) {
+    color: $color;
+
+    display: inline-block;
+    position: relative;
+
+    text-decoration: none;
+    &:after {
+        content: "";
+        width: 100%;
+        height: 1px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+
+        background-color: $color;
+
+        transition: transform $trans-time-fast;
+    }
+    &:not(:hover):after { transform: scale(0,1);  }
+    &:hover:after       { transform: scale(1,1);  }
+
+}

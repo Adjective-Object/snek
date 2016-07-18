@@ -1,3 +1,5 @@
+@import './mixins.scss';
+
 .packageStatusView {
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 2px;
@@ -38,11 +40,13 @@
                 font-size: 0.7em;
                 vertical-align: middle;
 
-                transition: transform 0.2s;
+                transition: transform $trans-time-med;
             }
         }
 
-        time {
+        .permalink {
+            z-index: 2000;
+            @include fancy-underline(#263B6E);
             font-style: italic;
             margin-left: auto;
             float: right;
@@ -50,6 +54,7 @@
             position: absolute;
             top: $padding;
             right: $padding;
+
         }
 
         .description {
@@ -109,10 +114,10 @@
                     overflow: hidden;
                     white-space: nowrap;
 
-                    transition: opacity 0.3s, max-width 0.3s;
+                    transition: opacity $trans-time-med, max-width $trans-time-med;
                 }
 
-                transition: color 0.3s;
+                transition: color $trans-time-med;
                 &:hover {
                     color: white;
                 }
@@ -169,7 +174,7 @@
             margin-right: 0.5em;
         }
 
-        transition: height 0.2s, opacity 0.2s, line-height 0.2s;
+        transition: height $trans-time-med, opacity $trans-time-med, line-height $trans-time-med;
         line-height: 1em;
 
         will-change: auto;

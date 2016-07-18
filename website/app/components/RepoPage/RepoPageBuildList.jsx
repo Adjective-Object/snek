@@ -4,10 +4,11 @@ import * as types from '../../types';
 
 // page
 export default class RepoPageBuildList extends Component {
+
   render() {
     let repoDetails = this.props.repoDetails;
-    let latestBuildId = repoDetails.latest_build;
-    if (!latestBuildId) {
+    let selectedBuildId = this.props.selectedBuildId || repoDetails.latest_build;
+    if (!repoDetails.latest_build) {
       return (<div>
                 No builds have been performed
             </div>);
@@ -19,7 +20,8 @@ export default class RepoPageBuildList extends Component {
                 <Build
                     key={ key }
                     build={ repoDetails.log_entries[key] }
-                    initialExpanded={(latestBuildId === key)}/>
+                    buildId={ key }
+                    initialExpanded={ selectedBuildId === key }/>
                 );
     }
 
@@ -32,5 +34,5 @@ export default class RepoPageBuildList extends Component {
 }
 RepoPageBuildList.propTypes = {
   repoDetails: types.repoDetails,
-  latestBuildId: React.PropTypes.string
+  selectedBuildId: React.PropTypes.string
 };

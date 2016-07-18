@@ -4,6 +4,8 @@ import PastTimer from '../common/PastTimer';
 import BuildPackageList from './BuildPackageList';
 import * as types from '../../types';
 
+import { Link } from 'react-router';
+
 let getPkgStateCounts = (packageStates) => {
   let pkgStates = {
     success: 0,
@@ -26,17 +28,20 @@ let getPkgStateCounts = (packageStates) => {
 
 export default class Build extends Component {
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
     this.state = {
       // coerce to bool
       expanded: this.props.initialExpanded && true
     };
   }
 
+  componentDidMount() {
+    document.getElementById('page').scrollTop = 200;
+  }
+
   render() {
     let build = this.props.build;
-
     let buildTime =
             new Date(build.time * 1000);
 
@@ -65,7 +70,10 @@ export default class Build extends Component {
                     })}>
 
                     <PackageStatus pkgStates={pkgStates}/>
-                    <PastTimer dateTime={buildTime} />
+                    <Link to={this.props.buildId}
+                          className="permalink">
+                      <PastTimer dateTime={buildTime} />
+                    </Link>
 
                     <div className="description">
                         <h2 className="build-hash">
@@ -89,5 +97,9 @@ export default class Build extends Component {
 }
 Build.propTypes = {
   build: types.build.isRequired,
+  buildId: React.PropTypes.string,
   initialExpanded: React.PropTypes.bool
+};
+Build.contextTypes = {
+  location: React.PropTypes.object
 };

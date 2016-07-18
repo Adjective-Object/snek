@@ -126,17 +126,21 @@ const Application = ({ children, location }) => {
       <Route path="/" component={App}>
         <IndexRoute component={IndexPage}/>
         <Route path="repos" component={RepoListPage}
-                onEnter={ (nextState) =>
+                onEnter={ (nextState) => {
                   store.dispatch(
                     actions.fetchRepoList()
-                  )
-                } />
+                  );
+                }} />
         <Route path="repos/:repoId" component={RepoPage}
                 onEnter={ (nextState) =>
                   store.dispatch(
                     actions.fetchRepoDetails(nextState.params.repoId)
                   )
-                }/>
+                }>
+          <Route path=":buildId" component={RepoPage}>
+            <Route path=":packageName" component={RepoPage} />
+          </Route>
+        </Route>
         <Route path="about" component={AboutPage} />
       </Route>
     </Router>

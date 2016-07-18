@@ -1,8 +1,6 @@
 @import 'font-awesome.scss';
 @import 'repo-details.scss';
-
-$trans-time-fast: 0.1s;
-$trans-time-med: 0.3s;
+@import 'mixins.scss';
 
 *, *:before, *:after {
     margin: 0;

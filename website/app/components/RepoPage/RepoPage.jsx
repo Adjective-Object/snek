@@ -32,17 +32,20 @@ class _RepoPage extends Component {
     case NETWORK_STATE_NONE:
     default:
       return this.renderLoadScreen();
-
     }
   }
 
   renderMainScreen() {
-    return (<div>
+    return (
+          <div>
             <h1> { this.props.repo.name } </h1>
             { (this.props.repoDetails)
-                ? <RepoPageBuildList repoDetails={ this.props.repoDetails } />
+                ? <RepoPageBuildList
+                    repoDetails={ this.props.repoDetails }
+                    selectedBuildId={ this.props.selectedBuildId } />
                 : <p>Loading details..</p> }
-        </div>);
+          </div>
+          );
   }
 
   renderLoadScreen() {
@@ -75,7 +78,12 @@ class _RepoPage extends Component {
 _RepoPage.propTypes = {
   repo: types.repo,
   networkStateRepoList: React.PropTypes.string,
-  repoDetails: types.repoDetails
+  repoDetails: types.repoDetails,
+  selectedBuildId: React.PropTypes.string,
+  selectedPackageId: React.PropTypes.string
+};
+_RepoPage.childContextTypes = {
+  pageLocation: React.PropTypes.object
 };
 
 let RepoPage = connect(
@@ -90,6 +98,16 @@ let RepoPage = connect(
                 state.details,
                 [ ownProps.params.repoId ]
                 ),
+
+        selectedBuildId: tryPath(
+            ownProps.params,
+            [ 'buildId' ]
+          ),
+
+        selectedPackageId: tryPath(
+            ownProps.params,
+            [ 'packageId' ]
+          ),
 
         networkStateRepoList:
                 state.networkState[FETCH_REPO_LIST] ||
