@@ -52,3 +52,14 @@ export const fetchRepoDetails = (id) => {
     { repo: id }
   );
 };
+
+
+export const FETCH_BUILD_LOG = 'FETCH_BUILD_LOG';
+export const fetchBuildLog = (id) => {
+  return fetchApi(
+    FETCH_BUILD_LOG,
+    '/api/builds/' + id,
+    null,
+    { log: id }
+  );
+};

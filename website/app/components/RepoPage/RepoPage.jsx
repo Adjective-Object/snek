@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { tryPath } from '../../util';
+import PackageBuildLog from './PackageBuildLog';
 
 import {
     FETCH_REPO_LIST,
@@ -37,13 +38,22 @@ class _RepoPage extends Component {
 
   renderMainScreen() {
     return (
-          <div>
-            <h1> { this.props.repo.name } </h1>
-            { (this.props.repoDetails)
-                ? <RepoPageBuildList
-                    repoDetails={ this.props.repoDetails }
-                    selectedBuildId={ this.props.selectedBuildId } />
-                : <p>Loading details..</p> }
+          <div className="repo-main-page">
+            <div className="build-list">
+              <h1> { this.props.repo.name } </h1>
+              { (this.props.repoDetails)
+                  ? <RepoPageBuildList
+                      repoDetails={ this.props.repoDetails }
+                      selectedBuildId={ this.props.selectedBuildId } />
+                  : <p>Loading details..</p> }
+            </div>
+            <div className="logs">
+              <h2>log</h2>
+                { (this.props.buildLog)
+                    ? <PackageBuildLog buildLog={this.props.buildLog} />
+                    : <p>Gimme a sec</p>
+                }
+            </div>
           </div>
           );
   }
@@ -80,7 +90,9 @@ _RepoPage.propTypes = {
   networkStateRepoList: React.PropTypes.string,
   repoDetails: types.repoDetails,
   selectedBuildId: React.PropTypes.string,
-  selectedPackageId: React.PropTypes.string
+  selectedPackageId: React.PropTypes.string,
+  // TODO type for this in types decl
+  buildLog: React.PropTypes.object
 };
 _RepoPage.childContextTypes = {
   pageLocation: React.PropTypes.object
@@ -108,6 +120,11 @@ let RepoPage = connect(
             ownProps.params,
             [ 'packageId' ]
           ),
+
+        buildLog: tryPath(
+          state.logs,
+          [ownProps.params.buildId, 'packages', ownProps.params.packageId]
+        ),
 
         networkStateRepoList:
                 state.networkState[FETCH_REPO_LIST] ||

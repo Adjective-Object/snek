@@ -3,7 +3,9 @@ import {
     NETWORK_STATE_REQUESTING,
     NETWORK_STATE_FAILURE,
     NETWORK_STATE_SUCCESS,
-    FETCH_REPO_LIST
+    FETCH_REPO_LIST,
+    FETCH_REPO_DETAILS,
+    FETCH_BUILD_LOG
 } from '../actions/actions.jsx';
 
 import _ from 'underscore';
@@ -38,7 +40,7 @@ let responses = {
     }
   }),
 
-  FETCH_REPO_DETAILS: networkHandler((state, action) => {
+  [FETCH_REPO_DETAILS]: networkHandler((state, action) => {
     switch(action.network) {
     case NETWORK_STATE_REQUESTING:
     case NETWORK_STATE_FAILURE:
@@ -51,6 +53,21 @@ let responses = {
       return state;
     }
   }),
+
+  [FETCH_BUILD_LOG]: networkHandler((state, action) => {
+    switch(action.network) {
+    case NETWORK_STATE_REQUESTING:
+    case NETWORK_STATE_FAILURE:
+      return _(state).clone();
+    case NETWORK_STATE_SUCCESS:
+      let newState = _(state).clone();
+      newState.logs[action.log] = action.responseBody;
+      return newState;
+    default:
+      return state;
+    }
+  }),
+
 
   '@@redux/INIT': identity,
   default: identity

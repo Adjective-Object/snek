@@ -1,4 +1,5 @@
 @import './mixins.scss';
+$padding: 1em;
 
 .packageStatusView {
     border: 1px solid rgba(0, 0, 0, 0.2);
@@ -24,7 +25,6 @@
         display: flex;
         justify-content: stretch;
         min-height: 100px;
-        $padding: 1em;
 
         cursor: pointer;
 
@@ -201,8 +201,20 @@
             opacity: 0;
         }        
     }
+}
 
+.repo-main-page {
+    display: flex;
+    justify-content: center;
+}
 
+.build-list {
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin-right: $padding;
+}
 
-
+.logs {
+    padding: $padding;
+    max-width: 600px;
 }

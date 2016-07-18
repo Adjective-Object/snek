@@ -79,12 +79,12 @@ def get_build_status(build_id):
         pkgs = build.get_package_statuses()
 
         return json.dumps({
-            build_id: build.build_id,
-            time: build.build_time,
-            logs: {
-                "fetch": build.build_logs["fetch"]
+            "build_id": build.handle,
+            "time": build.build_time,
+            "logs": {
+                # "fetch": build.build_logs["fetch"]
             },
-            packages: pkgs
+            "packages": pkgs
         })
 
 @blueprint.route('/builds/<build_id>/<package_name>', methods=['GET'])

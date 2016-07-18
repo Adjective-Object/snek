@@ -67,7 +67,10 @@ class Build(object):
             return None
 
         b = Build(build_log["repo_id"])
-        b._load_build_from_log(build_log)
+        b.handle = build_id
+        b.packages = build_log["packages"].keys()
+        b.build_time = build_log["time"]
+
         return b
 
     ###################
@@ -178,15 +181,19 @@ class Build(object):
     def build(self):
         self.build_time = int(time.time())
         self.handle = "%s-%s" % (self.repo_id, self.build_time)
-        threading.Thread(target=self._build).start()
-
-    def _build(self):
-        ongoing_builds.add(self.handle)
 
         # add an entry for this specific build to the log
         log.init(self.handle);
         if (not status.exists(self.repo_id)):
             status.init(self.repo_id)
+
+        log.append(self.handle, ["repo_id"], self.repo_id)
+        log.append(self.handle, ["time"], str(self.build_time))
+
+        threading.Thread(target=self._build).start()
+
+    def _build(self):
+        ongoing_builds.add(self.handle)
 
         status.add_build(self.repo_id, self.handle, self.build_time)
 
@@ -238,9 +245,5 @@ class Build(object):
     # POST-BUILD QUERYING #
     #######################
 
-    def _load_build_from_log(self, log):
-        self.packages = list(log["pkgs"].keys())
-
     def get_package_statuses(self):
-        # TODO
-        return []
+        return log.content(self.handle)["packages"]

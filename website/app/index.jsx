@@ -137,8 +137,13 @@ const Application = ({ children, location }) => {
                     actions.fetchRepoDetails(nextState.params.repoId)
                   )
                 }>
-          <Route path=":buildId" component={RepoPage}>
-            <Route path=":packageName" component={RepoPage} />
+          <Route path=":buildId" component={RepoPage}
+                onEnter={ (nextState) =>
+                  store.dispatch(
+                    actions.fetchBuildLog(nextState.params.buildId)
+                  )
+                }>
+            <Route path=":packageId" component={RepoPage}/>
           </Route>
         </Route>
         <Route path="about" component={AboutPage} />
