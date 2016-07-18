@@ -8,11 +8,11 @@
     max-width: 400px;
 
 
-    &[data-state="success"]:hover, &[data-state="success"].visible {border-color: #0F8C75;}
-    &[data-state="ongoing"]:hover, &[data-state="ongoing"].visible {border-color: #263B6E;}
-    &[data-state="failure"]:hover, &[data-state="failure"].visible {border-color: #BF535D;}
+    &[data-state="success"]:hover, &[data-state="success"].expanded {border-color: #0F8C75;}
+    &[data-state="ongoing"]:hover, &[data-state="ongoing"].expanded {border-color: #263B6E;}
+    &[data-state="failure"]:hover, &[data-state="failure"].expanded {border-color: #BF535D;}
 
-    &.visible .build-short-summary .build-hash:before {
+    &.expanded .build-short-summary .build-hash:before {
         transform: rotate(90deg);
     }
 
@@ -182,14 +182,19 @@
         padding-right: 0.5em;
     }
 
-    .repo-details.visible .package {
-        opacity: 1;
-        height: 2em;
-        line-height: 2em;
+    &.expanded {
+        .package-list .package {
+            opacity: 1;
+            height: 2em;
+            line-height: 2em;
+        }
     }
-    .repo-details:not(.visible) .package {
-        height: 0;
-        opacity: 0;
+
+    &:not(.expanded) {
+        .package-list .package {
+            height: 0;
+            opacity: 0;
+        }        
     }
 
 

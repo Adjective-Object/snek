@@ -32,9 +32,7 @@ let RepoListPage = connect(
       return {
         repos: state.repos
       };
-    },
-    dispatch => {}
-
+    }
     )(_RepoListPage);
 _RepoListPage.propTypes = _RepoListPage.propTypes;
 

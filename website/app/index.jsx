@@ -8,7 +8,7 @@ import {
 
 import IndexPage from './components/IndexPage';
 import AboutPage from './components/AboutPage';
-import RepoPage from './components/RepoPage';
+import RepoPage from './components/RepoPage/RepoPage';
 import RepoListPage from './components/RepoListPage';
 
 
@@ -109,7 +109,7 @@ class _App extends Component {
 }
 _App.propTypes = {
   repos: React.PropTypes.objectOf(types.repo),
-  children: React.PropTypes.arrayOf(React.PropTypes.element)
+  children: React.PropTypes.object
 };
 
 const App = connect(
@@ -117,11 +117,7 @@ const App = connect(
     return {
       repos: state.repos
     };
-  },
-
-  dispatch => {}
-
-  )(_App);
+  })(_App);
 App.propTypes = _App.propTypes;
 
 const Application = ({ children, location }) => {
@@ -146,10 +142,10 @@ const Application = ({ children, location }) => {
     </Router>
   );
 };
-Application.propTypes = React.PropTypes.shape({
-  children: React.PropTypes.arrayOf(React.PropTypes.element),
+Application.propTypes = {
+  children: React.PropTypes.object,
   location: React.PropTypes.object
-});
+};
 
 setTimeout(() => {
   store.dispatch(actions.fetchRepoList());

@@ -5,7 +5,7 @@ let objectOf = React.PropTypes.objectOf;
 let number = React.PropTypes.number;
 
 /* eslint-disable camelcase */
-export let repos = shape({
+export let repo = shape({
   name: string,
   nixpkgs: string,
   url: string
@@ -13,13 +13,13 @@ export let repos = shape({
 
 export let build = shape({
   build_status: string,
-  git: {
+  git: shape({
     msg: string,
     revision: string
-  },
-  package_status: objectOf({
-    status: string
   }),
+  package_status: objectOf(shape({
+    status: string
+  })),
   time: number
 });
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { tryPath } from '../util';
+import { tryPath } from '../../util';
 
 import {
     FETCH_REPO_LIST,
@@ -9,10 +9,10 @@ import {
     NETWORK_STATE_REQUESTING,
     NETWORK_STATE_FAILURE,
     NETWORK_STATE_SUCCESS
-} from '../actions/actions';
+} from '../../actions/actions';
+import * as types from '../../types';
 
-import RepoPageDetails from './RepoPageDetails';
-import * as types from '../types';
+import RepoPageBuildList from './RepoPageBuildList';
 
 
 class _RepoPage extends Component {
@@ -40,7 +40,7 @@ class _RepoPage extends Component {
     return (<div>
             <h1> { this.props.repo.name } </h1>
             { (this.props.repoDetails)
-                ? <RepoPageDetails repoDetails={ this.props.repoDetails } />
+                ? <RepoPageBuildList repoDetails={ this.props.repoDetails } />
                 : <p>Loading details..</p> }
         </div>);
   }
@@ -75,7 +75,7 @@ class _RepoPage extends Component {
 _RepoPage.propTypes = {
   repo: types.repo,
   networkStateRepoList: React.PropTypes.string,
-  repoDetails: React.PropTypes.objectOf(types.repoDetails)
+  repoDetails: types.repoDetails
 };
 
 let RepoPage = connect(
@@ -99,9 +99,6 @@ let RepoPage = connect(
                 state.networkState[FETCH_REPO_DETAILS] ||
                 NETWORK_STATE_NONE
       };
-    },
-    dispatch => {
-
     }
     )(_RepoPage);
 
