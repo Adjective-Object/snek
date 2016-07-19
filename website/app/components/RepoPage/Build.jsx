@@ -70,7 +70,7 @@ export default class Build extends Component {
                     })}>
 
                     <PackageStatus pkgStates={pkgStates}/>
-                    <Link to={this.props.buildId}
+                    <Link to={ `/repos/${this.context.pageLocation.repoId}/${this.props.buildId}` }
                           className="permalink">
                       <PastTimer dateTime={buildTime} />
                     </Link>
@@ -101,5 +101,5 @@ Build.propTypes = {
   initialExpanded: React.PropTypes.bool
 };
 Build.contextTypes = {
-  location: React.PropTypes.object
+  pageLocation: React.PropTypes.object
 };

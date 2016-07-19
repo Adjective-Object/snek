@@ -20,6 +20,7 @@ import createLogger from 'redux-logger';
 
 import './style/index.scss';
 import * as types from './types';
+import { sliceAtNth } from './util';
 import * as actions from './actions/actions';
 
 const loggerMiddleware = createLogger();
@@ -100,7 +101,7 @@ class _App extends Component {
           transitionLeaveTimeout={300}
         >
           {React.cloneElement(this.props.children, {
-            key: location.pathname
+            key: sliceAtNth(location.pathname, '/', 3)
           })}
         </ReactCSSTransitionGroup>
       </div>

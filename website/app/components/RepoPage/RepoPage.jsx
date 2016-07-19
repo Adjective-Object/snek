@@ -17,9 +17,19 @@ import RepoPageBuildList from './RepoPageBuildList';
 
 
 class _RepoPage extends Component {
+  getChildContext() {
+    return {
+      pageLocation: {
+        repoId: this.props.selectedRepoId,
+        buildId: this.props.selectedBuildId,
+        pkgId: this.props.selectedPackageId
+      }
+    };
+  }
+
   render() {
     if (this.props.repo) {
-            // render repo if it exists
+      // render repo if it exists
       return this.renderMainScreen();
     }
 
@@ -41,19 +51,26 @@ class _RepoPage extends Component {
           <div className="repo-main-page">
             <div className="build-list">
               <h1> { this.props.repo.name } </h1>
-              { (this.props.repoDetails)
-                  ? <RepoPageBuildList
-                      repoDetails={ this.props.repoDetails }
-                      selectedBuildId={ this.props.selectedBuildId } />
-                  : <p>Loading details..</p> }
+              { this.props.repoDetails
+                ? <RepoPageBuildList
+                    repoDetails={ this.props.repoDetails }
+                    selectedBuildId={ this.props.selectedBuildId } />
+
+                : <p>Loading details..</p>
+              }
             </div>
-            <div className="logs">
-              <h2>log</h2>
-                { (this.props.buildLog)
-                    ? <PackageBuildLog buildLog={this.props.buildLog} />
-                    : <p>Gimme a sec</p>
-                }
-            </div>
+
+            { this.props.selectedPackageId
+                ? <div className="logs">
+                    <h2>log</h2>
+                      { (this.props.buildLog)
+                          ? <PackageBuildLog buildLog={this.props.buildLog} />
+                          : <p>Gimme a sec</p>
+                      }
+                  </div>
+
+                : null
+          }
           </div>
           );
   }
@@ -91,6 +108,7 @@ _RepoPage.propTypes = {
   repoDetails: types.repoDetails,
   selectedBuildId: React.PropTypes.string,
   selectedPackageId: React.PropTypes.string,
+  selectedRepoId: React.PropTypes.string,
   // TODO type for this in types decl
   buildLog: React.PropTypes.object
 };
@@ -110,6 +128,11 @@ let RepoPage = connect(
                 state.details,
                 [ ownProps.params.repoId ]
                 ),
+
+        selectedRepoId: tryPath(
+            ownProps.params,
+            [ 'repoId' ]
+          ),
 
         selectedBuildId: tryPath(
             ownProps.params,

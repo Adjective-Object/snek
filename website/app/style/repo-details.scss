@@ -151,6 +151,27 @@ $padding: 1em;
     .package {
         display: flex;
 
+        text-decoration: none;
+        color: inherit;
+
+        position: relative;
+
+        .package-name:after {
+            content: '\f054';
+            font-family: 'FontAwesome';
+
+            opacity: 0;
+            display: inline-block;
+            transform: translate(1em,0);
+            transition: opacity $trans-time-fast,
+                        transform $trans-time-fast;
+        }
+
+        &:hover .package-name:after {
+            opacity: 1;
+            transform: translate(2em, 0);
+        }
+
         .package-status {
             text-align: right;
             flex-grow: 1;
@@ -206,7 +227,6 @@ $padding: 1em;
 .repo-main-page {
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
 }
 
 .build-list {
@@ -218,17 +238,18 @@ $padding: 1em;
     padding: $padding;
     max-width: 600px;
     min-width: 300px;
+    overflow-y: auto;
 }
 
 .build-log-step {
     pre {
         overflow: auto;
-        background-color: #1B2B27;
-        color: white;
+        background-color: #EFEFEF;
+        color: #222222;
         padding: 1em;
     }
 
-    h3 ~ h3{
+    h3 {
         margin-top: 1em;
     }
 }
