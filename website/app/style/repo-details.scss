@@ -8,8 +8,8 @@ $padding: 1em;
     margin-top: 1em;
     margin-bottom: 1em;
 
-    max-width: 400px;
-
+    min-width: 300px;
+    max-width: 600px;
 
     &[data-state="success"]:hover, &[data-state="success"].expanded {border-color: #0F8C75;}
     &[data-state="ongoing"]:hover, &[data-state="ongoing"].expanded {border-color: #263B6E;}
@@ -206,15 +206,29 @@ $padding: 1em;
 .repo-main-page {
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .build-list {
-    flex-shrink: 0;
-    flex-grow: 0;
-    margin-right: $padding;
+    max-width: 600px;
+    min-width: 300px;
 }
 
 .logs {
     padding: $padding;
     max-width: 600px;
+    min-width: 300px;
+}
+
+.build-log-step {
+    pre {
+        overflow: auto;
+        background-color: #1B2B27;
+        color: white;
+        padding: 1em;
+    }
+
+    h3 ~ h3{
+        margin-top: 1em;
+    }
 }
