@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import { Link } from 'react-router';
+import { makeRoute } from '../../util';
 
 export default class PackageBuildLog extends Component {
   render() {
@@ -15,6 +17,12 @@ export default class PackageBuildLog extends Component {
     }
     return (
       <div>
+        <Link to={makeRoute({
+          repoId: this.context.pageLocation.repoId,
+          buildId: this.context.pageLocation.buildId
+        })}>
+          x
+        </Link>
         { steps }
       </div>
     );
@@ -23,3 +31,7 @@ export default class PackageBuildLog extends Component {
 PackageBuildLog.propTypes = {
   buildLog: React.PropTypes.object
 };
+PackageBuildLog.contextTypes = {
+  pageLocation: React.PropTypes.object
+};
+

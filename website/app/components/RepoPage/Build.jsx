@@ -71,7 +71,8 @@ export default class Build extends Component {
 
                     <PackageStatus pkgStates={pkgStates}/>
                     <Link to={ `/repos/${this.context.pageLocation.repoId}/${this.props.buildId}` }
-                          className="permalink">
+                          className="permalink"
+                          onClick={(e) => e.stopPropagation()}>
                       <PastTimer dateTime={buildTime} />
                     </Link>
 

@@ -1,6 +1,8 @@
 import React from 'react';
-import * as types from '../../types';
 import { Link } from 'react-router';
+
+import * as types from '../../types';
+import { makeRoute } from '../../util';
 
 let BuildPackageList = (props, context) => {
     // build list of package statuses
@@ -8,14 +10,18 @@ let BuildPackageList = (props, context) => {
   let packages = props.build.package_status;
   for (let pkg in packages) {
     packageStatuses.push(
-        <Link to={ `/repos/${context.pageLocation.repoId}/${context.pageLocation.buildId}/${pkg}` }
-              className="package"
-              key={pkg}>
+        <Link to={ makeRoute({
+          repoId: context.pageLocation.repoId,
+          buildId: context.pageLocation.buildId,
+          packageId: pkg
+        })}
+          className="package"
+          key={pkg}>
 
-              <span className="package-name">{pkg}</span>
-              <span className={`package-status ${packages[pkg].status}`}>
-                  {packages[pkg].status}
-              </span>
+          <span className="package-name">{pkg}</span>
+          <span className={`package-status ${packages[pkg].status}`}>
+              {packages[pkg].status}
+          </span>
         </Link>
             );
   }

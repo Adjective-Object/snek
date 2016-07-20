@@ -39,7 +39,7 @@ export function tryPath(obj, args) {
   return tryPath(obj[args[0]], args.slice(1));
 }
 
-export function thisRoute(pageLocation) {
+export function makeRoute(pageLocation) {
   let path = '/repos';
   let parts = [
     {key: 'repoId', routePart: `/${pageLocation.repoId}`},
@@ -61,7 +61,7 @@ export function thisRoute(pageLocation) {
 export function makeLinkTo(pageLocation, path) {
   switch(path.charAt(0)) {
   case '/': return path.substring(1);
-  case '-': return thisRoute(pageLocation) + '/' + path.substring(2);
+  case '-': return makeRoute(pageLocation) + '/' + path.substring(2);
   default: return path;
   }
 }
