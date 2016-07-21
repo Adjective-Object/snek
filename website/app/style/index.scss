@@ -138,7 +138,6 @@ body, html, #react-host, #app-root, #site-nav, #page {
                         transform   $trans-time-med;
         }
 
-
         &.page-slide-down-enter {
             transform: translate(0, -32px);
             opacity: 0;            
@@ -149,8 +148,8 @@ body, html, #react-host, #app-root, #site-nav, #page {
             opacity: 0;
         }
 
-        &.page-slide-down-leave:not(.page-slide-down-leave-active),
-        &.page-slide-up-leave:not(.page-slide-up-leave-active),
+        &.page-slide-down-leave,
+        &.page-slide-up-leave,
         &.page-slide-down-enter-active,
         &.page-slide-up-enter-active {
             transform: translate(0, 0);

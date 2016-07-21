@@ -7,7 +7,7 @@ export default class RepoPageBuildList extends Component {
 
   render() {
     let repoDetails = this.props.repoDetails;
-    let selectedBuildId = this.props.selectedBuildId || repoDetails.latest_build;
+    let selectedBuildId = this.context.pageLocation.buildId || repoDetails.latest_build;
     if (!repoDetails.latest_build) {
       return (<div>
                 No builds have been performed
@@ -33,6 +33,8 @@ export default class RepoPageBuildList extends Component {
   }
 }
 RepoPageBuildList.propTypes = {
-  repoDetails: types.repoDetails,
-  selectedBuildId: React.PropTypes.string
+  repoDetails: types.repoDetails
+};
+RepoPageBuildList.contextTypes = {
+  pageLocation: types.pageLocation
 };

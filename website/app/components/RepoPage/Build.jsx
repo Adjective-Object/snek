@@ -3,6 +3,7 @@ import PackageStatus from './PackageStatus';
 import PastTimer from '../common/PastTimer';
 import BuildPackageList from './BuildPackageList';
 import * as types from '../../types';
+import { makeRoute } from '../../util';
 
 import { Link } from 'react-router';
 
@@ -36,10 +37,6 @@ export default class Build extends Component {
     };
   }
 
-  componentDidMount() {
-    document.getElementById('page').scrollTop = 200;
-  }
-
   render() {
     let build = this.props.build;
     let buildTime =
@@ -70,7 +67,10 @@ export default class Build extends Component {
                     })}>
 
                     <PackageStatus pkgStates={pkgStates}/>
-                    <Link to={ `/repos/${this.context.pageLocation.repoId}/${this.props.buildId}` }
+                    <Link to={ makeRoute({
+                      repoId: this.context.pageLocation.repoId,
+                      buildId: this.props.buildId
+                    }) }
                           className="permalink"
                           onClick={(e) => e.stopPropagation()}>
                       <PastTimer dateTime={buildTime} />
@@ -102,5 +102,5 @@ Build.propTypes = {
   initialExpanded: React.PropTypes.bool
 };
 Build.contextTypes = {
-  pageLocation: React.PropTypes.object
+  pageLocation: types.pageLocation
 };

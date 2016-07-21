@@ -28,4 +28,10 @@ export let repoDetails = shape({
   log_entries: objectOf(build)
 });
 
+export let pageLocation = shape({
+  repoId: React.PropTypes.string,
+  buildId: React.PropTypes.string,
+  packageId: React.PropTypes.string
+});
+
 /* eslint-enable camelcase */

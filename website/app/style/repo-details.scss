@@ -164,10 +164,15 @@ $padding: 1em;
             display: inline-block;
             transform: translate(1em,0);
             transition: opacity $trans-time-fast,
-                        transform $trans-time-fast;
+                        transform $trans-time-fast,
+                        color $trans-time-fast;
         }
 
         &:hover .package-name:after {
+            opacity: 0.8;
+            transform: translate(1.5em, 0);
+        }
+        &.active .package-name:after {
             opacity: 1;
             transform: translate(2em, 0);
         }
@@ -206,6 +211,12 @@ $padding: 1em;
 
         padding-left: 0.5em;
         padding-right: 0.5em;
+
+        &.active.success   .package-name:after  { color: #0F8C75; }
+        &.active.failure   .package-name:after  { color: #BF535D; }
+        &.active.ongoing   .package-name:after  { color: #15346E; }
+        &.active.unstarted .package-name:after  { color: #48544F; }
+
     }
 
     &.expanded {
@@ -226,7 +237,7 @@ $padding: 1em;
 
 .repo-main-page {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .build-list {
@@ -237,8 +248,6 @@ $padding: 1em;
 .logs {
     padding: $padding;
     max-width: 600px;
-    min-width: 300px;
-    overflow-y: auto;
 }
 
 .build-log-step {
@@ -252,4 +261,52 @@ $padding: 1em;
     h3 {
         margin-top: 1em;
     }
+}
+
+.log-enter, .log-leave {
+    transition: opacity     $trans-time-med,
+                transform   $trans-time-med;
+}
+
+.log-enter {
+    transform: translate(-32px, 0);
+    opacity: 0;
+}
+
+.log-enter-active {
+    transform: translate(0, 0px);
+    opacity: 1;
+}
+
+.log-leave {
+    transform: translate(0, 0px);
+    opacity: 1;
+}
+
+.log-leave-active {
+    transform: translate(32px, 0);
+    opacity: 0;
+}
+
+#log-transition-container {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#log-transition-container.empty {
+}
+
+.log-close-link:before {
+    content: "\f00d";
+    font-family: 'FontAwesome';
+    margin-right: 0.5em;
+    font-size: 0.6em;
+}
+.log-close-link:hover {
+    color: #BF535D;
+}
+.log-close-link {
+    text-decoration: none;
+    color: inherit;    
 }

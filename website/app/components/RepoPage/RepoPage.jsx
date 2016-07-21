@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { tryPath } from '../../util';
-import PackageBuildLog from './PackageBuildLog';
+import RepoMainPage from './RepoMainPage';
 
 import {
     FETCH_REPO_LIST,
@@ -13,8 +13,6 @@ import {
 } from '../../actions/actions';
 import * as types from '../../types';
 
-import RepoPageBuildList from './RepoPageBuildList';
-
 
 class _RepoPage extends Component {
   getChildContext() {
@@ -22,7 +20,7 @@ class _RepoPage extends Component {
       pageLocation: {
         repoId: this.props.selectedRepoId,
         buildId: this.props.selectedBuildId,
-        pkgId: this.props.selectedPackageId
+        packageId: this.props.selectedPackageId
       }
     };
   }
@@ -47,32 +45,11 @@ class _RepoPage extends Component {
   }
 
   renderMainScreen() {
-    return (
-          <div className="repo-main-page">
-            <div className="build-list">
-              <h1> { this.props.repo.name } </h1>
-              { this.props.repoDetails
-                ? <RepoPageBuildList
-                    repoDetails={ this.props.repoDetails }
-                    selectedBuildId={ this.props.selectedBuildId } />
-
-                : <p>Loading details..</p>
-              }
-            </div>
-
-            { this.props.selectedPackageId
-                ? <div className="logs">
-                    <h2>log</h2>
-                      { (this.props.buildLog)
-                          ? <PackageBuildLog buildLog={this.props.buildLog} />
-                          : <p>Gimme a sec</p>
-                      }
-                  </div>
-
-                : null
-          }
-          </div>
-          );
+    return (<RepoMainPage
+              repo={this.props.repo}
+              repoDetails={this.props.repoDetails}
+              buildLog={this.props.buildLog}
+            />);
   }
 
   renderLoadScreen() {

@@ -15,14 +15,20 @@ export default class PackageBuildLog extends Component {
         </div>
         );
     }
+
     return (
-      <div>
-        <Link to={makeRoute({
-          repoId: this.context.pageLocation.repoId,
-          buildId: this.context.pageLocation.buildId
-        })}>
-          x
-        </Link>
+      <div className="logs">
+        <h2>
+          <Link to={makeRoute({
+            repoId: this.context.pageLocation.repoId,
+            buildId: this.context.pageLocation.buildId
+          })}
+                className="log-close-link"
+                />
+
+          {this.context.pageLocation.packageId}
+        </h2>
+
         { steps }
       </div>
     );

@@ -15,11 +15,15 @@ let BuildPackageList = (props, context) => {
           buildId: context.pageLocation.buildId,
           packageId: pkg
         })}
-          className="package"
+          className={'package ' + (
+            context.pageLocation.packageId === pkg
+              ? 'active '
+              : ' ') +
+            (packages[pkg].status)}
           key={pkg}>
 
           <span className="package-name">{pkg}</span>
-          <span className={`package-status ${packages[pkg].status}`}>
+          <span className="package-status">
               {packages[pkg].status}
           </span>
         </Link>
@@ -36,7 +40,7 @@ BuildPackageList.propTypes = {
   build: types.build
 };
 BuildPackageList.contextTypes = {
-  pageLocation: React.PropTypes.object
+  pageLocation: types.pageLocation
 };
 
 
