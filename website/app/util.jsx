@@ -77,3 +77,11 @@ export function sliceAtNth(haystack, needle, count) {
   }
   return haystack.substring(0, index);
 }
+
+export function mapObjectKeys(obj, fn) {
+  let results = [];
+  for (let key of Object.keys(obj).sort()) {
+    results.push(fn(obj[key], key));
+  }
+  return results;
+}

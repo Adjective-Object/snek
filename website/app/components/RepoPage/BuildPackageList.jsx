@@ -2,46 +2,44 @@ import React from 'react';
 import { Link } from 'react-router';
 
 import * as types from '../../types';
-import { makeRoute } from '../../util';
+import { makeRoute, mapObjectKeys } from '../../util';
 
-let BuildPackageList = (props, context) => {
-    // build list of package statuses
-  let packageStatuses = [];
-  let packages = props.build.package_status;
-  for (let pkg in packages) {
-    packageStatuses.push(
-        <Link to={ makeRoute({
-          repoId: context.pageLocation.repoId,
-          buildId: context.pageLocation.buildId,
-          packageId: pkg
-        })}
-          className={'package ' + (
-            context.pageLocation.packageId === pkg
-              ? 'active '
-              : ' ') +
-            (packages[pkg].status)}
-          key={pkg}>
+let BuildListEntry = (buildId, repoId, pkg, packageId) =>
+  <Link to={ makeRoute({
+    repoId,
+    buildId,
+    packageId
+  })}
+    className={ 'package ' + pkg.status }
+    activeClassName="active"
+    key={packageId}>
 
-          <span className="package-name">{pkg}</span>
-          <span className="package-status">
-              {packages[pkg].status}
-          </span>
-        </Link>
-            );
-  }
+    <span className="package-name">{packageId}</span>
+    <span className="package-status">
+        {pkg.status}
+    </span>
+  </Link>;
 
-  return (
-        <div className="package-list">
-            {packageStatuses}
-        </div>
-        );
-};
+
+let BuildPackageList = (props, context) =>
+  <div className="package-list">
+      {mapObjectKeys(
+        props.build.package_status,
+        (pkg, packageId) => BuildListEntry(
+            props.buildId,
+            context.pageLocation.repoId,
+            pkg,
+            packageId
+          )
+      )}
+  </div>;
+
 BuildPackageList.propTypes = {
-  build: types.build
+  build: types.build,
+  buildId: React.PropTypes.string
 };
 BuildPackageList.contextTypes = {
   pageLocation: types.pageLocation
 };
-
 
 export default BuildPackageList;

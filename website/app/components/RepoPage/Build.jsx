@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import PackageStatus from './PackageStatus';
+import PackageBuildSummary from './PackageBuildSummary';
 import PastTimer from '../common/PastTimer';
 import BuildPackageList from './BuildPackageList';
 import * as types from '../../types';
@@ -66,7 +66,7 @@ export default class Build extends Component {
                       expanded: !this.state.expanded
                     })}>
 
-                    <PackageStatus pkgStates={pkgStates}/>
+                    <PackageBuildSummary pkgStates={pkgStates}/>
                     <Link to={ makeRoute({
                       repoId: this.context.pageLocation.repoId,
                       buildId: this.props.buildId
@@ -90,7 +90,7 @@ export default class Build extends Component {
 
                 </div>
 
-                <BuildPackageList build={build}/>
+                <BuildPackageList build={build} buildId={this.props.buildId}/>
 
             </div>
             );

@@ -1,40 +1,33 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Build from './Build';
 import * as types from '../../types';
+import { mapObjectKeys } from '../../util';
 
-// page
-export default class RepoPageBuildList extends Component {
+let BuildFromLogEntry = (selectedBuildId) => (logEntry, key) =>
+  <Build
+    key={ key }
+    build={ logEntry }
+    buildId={ key }
+    initialExpanded={ selectedBuildId === key }/>;
 
-  render() {
-    let repoDetails = this.props.repoDetails;
-    let selectedBuildId = this.context.pageLocation.buildId || repoDetails.latest_build;
-    if (!repoDetails.latest_build) {
-      return (<div>
-                No builds have been performed
-            </div>);
-    }
 
-    let builds = [];
-    for (let key of Object.keys(this.props.repoDetails.log_entries).sort().reverse()) {
-      builds.push(
-                <Build
-                    key={ key }
-                    build={ repoDetails.log_entries[key] }
-                    buildId={ key }
-                    initialExpanded={ selectedBuildId === key }/>
-                );
-    }
+let RepoPageBuildList = (props, context) =>
+    props.repoDetails.length
+      ? <div> No builds have been performed </div>
+      : <div>
+            { mapObjectKeys(
+                props.repoDetails.log_entries,
+                BuildFromLogEntry(
+                  context.pageLocation.buildId ||
+                  props.repoDetails.latest_build)
+                ).reverse() }
+        </div>;
 
-    return (
-            <div>
-                { builds }
-            </div>
-            );
-  }
-}
 RepoPageBuildList.propTypes = {
   repoDetails: types.repoDetails
 };
 RepoPageBuildList.contextTypes = {
   pageLocation: types.pageLocation
 };
+
+export default RepoPageBuildList;

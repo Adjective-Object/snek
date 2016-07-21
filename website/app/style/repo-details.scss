@@ -156,22 +156,36 @@ $padding: 1em;
 
         position: relative;
 
+
+        .package-name {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            padding-right: 3em;
+            flex-shrink: 1;
+        }
+
         .package-name:after {
             content: '\f054';
             font-family: 'FontAwesome';
+            text-align: left;
 
             opacity: 0;
+            font-size: 0.8em;
+            
             display: inline-block;
             transform: translate(1em,0);
             transition: opacity $trans-time-fast,
                         transform $trans-time-fast,
                         color $trans-time-fast;
+
         }
 
         &:hover .package-name:after {
             opacity: 0.8;
             transform: translate(1.5em, 0);
         }
+
         &.active .package-name:after {
             opacity: 1;
             transform: translate(2em, 0);
@@ -179,7 +193,8 @@ $padding: 1em;
 
         .package-status {
             text-align: right;
-            flex-grow: 1;
+            flex-shrink: 0;
+            margin-left: auto;
         }
 
         &.success       .package-status { color: #0F8C75; }
@@ -241,13 +256,13 @@ $padding: 1em;
 }
 
 .build-list {
-    max-width: 600px;
-    min-width: 300px;
+    width: 400px;
+    max-width: 50%;
+    flex-shrink: 0;
 }
 
 .logs {
     padding: $padding;
-    max-width: 600px;
 }
 
 .build-log-step {
@@ -302,6 +317,7 @@ $padding: 1em;
     font-family: 'FontAwesome';
     margin-right: 0.5em;
     font-size: 0.6em;
+    vertical-align: middle;
 }
 .log-close-link:hover {
     color: #BF535D;

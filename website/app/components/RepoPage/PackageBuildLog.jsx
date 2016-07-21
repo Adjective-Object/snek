@@ -1,43 +1,38 @@
-import React, {Component} from 'react';
+import React from 'react';
 import { Link } from 'react-router';
-import { makeRoute } from '../../util';
+import { makeRoute, mapObjectKeys } from '../../util';
 
-export default class PackageBuildLog extends Component {
-  render() {
-    let steps = [];
-    for (let step in this.props.buildLog) {
-      steps.push(
-        <div className="build-log-step" key={ step }>
-          <h3>{ step }</h3>
-          <pre>
-            { this.props.buildLog[step] }
-          </pre>
-        </div>
-        );
-    }
+let LogEntry = (stepLog, stepName) =>
+  <div className="build-log-step" key={ stepName }>
+    <h3>{ stepName }</h3>
+    <pre>
+      { stepLog }
+    </pre>
+  </div>;
 
-    return (
-      <div className="logs">
-        <h2>
-          <Link to={makeRoute({
-            repoId: this.context.pageLocation.repoId,
-            buildId: this.context.pageLocation.buildId
-          })}
-                className="log-close-link"
-                />
 
-          {this.context.pageLocation.packageId}
-        </h2>
+let PackageBuildLog = (props, context) =>
+  <div className="logs">
+    <h2>
+      <Link to={makeRoute({
+        repoId: context.pageLocation.repoId,
+        buildId: context.pageLocation.buildId
+      })}
+            className="log-close-link"
+            />
 
-        { steps }
-      </div>
-    );
-  }
-}
+      { context.pageLocation.packageId }
+    </h2>
+
+    { mapObjectKeys(props.buildLog, LogEntry) }
+  </div>;
+
 PackageBuildLog.propTypes = {
   buildLog: React.PropTypes.object
 };
 PackageBuildLog.contextTypes = {
   pageLocation: React.PropTypes.object
 };
+
+export default PackageBuildLog;
 
