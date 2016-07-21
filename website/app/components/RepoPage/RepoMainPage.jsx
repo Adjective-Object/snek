@@ -31,7 +31,6 @@ let RepoMainPage = (props, context) =>
         } else if (context.pageLocation.packageId) {
           return <p>Gimme a sec</p>;
         }
-
         return null;
       })() }
    </ReactCSSTransitionGroup>
@@ -41,7 +40,7 @@ let RepoMainPage = (props, context) =>
 RepoMainPage.propTypes = {
   repo: types.repo,
   repoDetails: types.repoDetails,
-  buildLog: types.buildLog
+  buildLog: React.PropTypes.object
 };
 
 RepoMainPage.contextTypes = {

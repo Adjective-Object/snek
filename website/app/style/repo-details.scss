@@ -182,15 +182,15 @@ $padding: 1em;
             flex-grow: 1;
         }
 
-        .package-status.success     { color: #0F8C75; }
-        .package-status.failure     { color: #BF535D; }
-        .package-status.ongoing     { color: #15346E; }
-        .package-status.unstarted   { color: #48544F; }
+        &.success       .package-status { color: #0F8C75; }
+        &.failure       .package-status { color: #BF535D; }
+        &.ongoing       .package-status { color: #15346E; }
+        &.unstarted     .package-status { color: #48544F; }
 
-        .package-status.success:before      { content: '\f00c'; }
-        .package-status.failure:before      { content: '\f00d'; }
-        .package-status.ongoing:before      { content: '\f017'; }
-        .package-status.unstarted:before    { content: '\f141'; }
+        &.success       .package-status:before  { content: '\f00c'; }
+        &.failure       .package-status:before  { content: '\f00d'; }
+        &.ongoing       .package-status:before  { content: '\f017'; }
+        &.unstarted     .package-status:before  { content: '\f141'; }
 
         .package-status:before {
             font-family: 'FontAwesome';
