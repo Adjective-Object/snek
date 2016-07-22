@@ -6,7 +6,7 @@ import {
     IndexRoute, Link
 } from 'react-router';
 
-import IndexPage from './components/IndexPage';
+import IndexPage from './components/IndexPage/IndexPage';
 import AboutPage from './components/AboutPage';
 import RepoPage from './components/RepoPage/RepoPage';
 import RepoListPage from './components/RepoListPage';

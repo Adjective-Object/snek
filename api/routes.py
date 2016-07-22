@@ -15,13 +15,36 @@ blueprint = Blueprint('api', __name__)
 # Routes #
 ##########
 
+def api_route(*args, **vargs):
+    def real_decorator(func):
+        r = wraps(func)(blueprint.route(*args, **vargs)(json_conv(func)))
+        r._original = func
+        return r
+
+    return real_decorator
+
 # get list of repos
-@blueprint.route('/repos', methods=['GET'])
+@api_route('/about', methods=['GET'])
+def get_about():
+    return {
+        "name": config.server.name,
+        "server-status": get_server_status._original()
+    }
+
+# get list of repos
+@api_route('/server-status', methods=['GET'])
+def get_server_status():
+    return {
+        "dependencies": "satisfied" # TODO
+    }
+
+# get list of repos
+@api_route('/repos', methods=['GET'])
 def get_repos():
-    return jsonify(config.repos)
+    return config.repos
 
 # get details on a given repo
-@blueprint.route('/repos/<repo_id>', methods=['GET'])
+@api_route('/repos/<repo_id>', methods=['GET'])
 def get_repo(repo_id):
 
     if repo_id not in config.repos.keys():
@@ -30,10 +53,10 @@ def get_repo(repo_id):
     if not status.exists(repo_id):
         status.init(repo_id)
 
-    return jsonify(status.content(repo_id))
+    return status.content(repo_id)
 
 # get list of builds
-@blueprint.route('/builds', methods=['GET'])
+@api_route('/builds', methods=['GET'])
 @validate_params(Schema({
     Optional('page'): Coerce(int),
     Optional('filter'): Coerce(str)
@@ -41,10 +64,10 @@ def get_repo(repo_id):
 def get_builds():
     #TODO: paginate
     #TODO: allow filter by active
-    return jsonify(log.list())
+    return log.list()
 
 #request a build
-@blueprint.route('/builds', methods=['POST'])
+@api_route('/builds', methods=['POST'])
 @validate_params(Schema({
     Required('repo_id'): Coerce(str)
     }))
@@ -63,12 +86,12 @@ def post_builds():
         build = Build(repo_id)
         build.build()
 
-    return json.dumps({
+    return {
             'status': 'success',
             'build_id': build.handle
-        })
+        }
 
-@blueprint.route('/builds/<build_id>', methods=['GET'])
+@api_route('/builds/<build_id>', methods=['GET'])
 def get_build_status(build_id):
     """ Fetches overview of a task (list of packages), some meta
     """
@@ -78,16 +101,16 @@ def get_build_status(build_id):
     else:
         pkgs = build.get_package_statuses()
 
-        return json.dumps({
+        return {
             "build_id": build.handle,
             "time": build.build_time,
             "logs": {
                 # "fetch": build.build_logs["fetch"]
             },
             "packages": pkgs
-        })
+        }
 
-@blueprint.route('/builds/<build_id>/<package_name>', methods=['GET'])
+@api_route('/builds/<build_id>/<package_name>', methods=['GET'])
 def get_package_status_in_build(build_id, package_name):
     build = log.get_build(build_id)
     if not build:
@@ -101,10 +124,10 @@ def get_package_status_in_build(build_id, package_name):
 
     else:
         pkg_logs = build.get_package_logs(package_name)
-        return json.dumps(pkg_logs)
+        return pkg_logs
 
 
-@blueprint.route('/hooks/github', methods=['POST'])
+@api_route('/hooks/github', methods=['POST'])
 def github_build_hook():
     if request.is_json:
         return _build(request.json['repository']['git_url'])

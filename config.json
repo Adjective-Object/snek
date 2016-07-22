@@ -3,6 +3,9 @@
         "host": "0.0.0.0",
         "debug": true
     },
+    "server": {
+        "name": "Some Build Server"
+    },
     "paths": {
         "store": "/nix/store",
         "repos": "./repos",

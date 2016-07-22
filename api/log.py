@@ -36,7 +36,7 @@ class FsStore(object):
         return self.build_log[handle]
 
     # list the things
-    def list():
+    def list(self):
         return self.build_log.keys()
 
 class FsBuildLog(FsStore):
