@@ -125,7 +125,12 @@ const Application = ({ children, location }) => {
   return (
     <Router history={browserHistory}>
       <Route path="/" component={App}>
-        <IndexRoute component={IndexPage}/>
+        <IndexRoute component={IndexPage}
+                onEnter={ (nextState) => {
+                  store.dispatch(actions.fetchServerAbout());
+                }}
+
+        />
         <Route path="repos" component={RepoListPage}
                 onEnter={ (nextState) => {
                   store.dispatch(

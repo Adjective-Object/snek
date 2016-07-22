@@ -5,7 +5,8 @@ import {
     NETWORK_STATE_SUCCESS,
     FETCH_REPO_LIST,
     FETCH_REPO_DETAILS,
-    FETCH_BUILD_LOG
+    FETCH_BUILD_LOG,
+    FETCH_SERVER_ABOUT
 } from '../actions/actions.jsx';
 
 import _ from 'underscore';
@@ -14,7 +15,8 @@ export const defaultState = {
   repos: {},
   details: {},
   networkState: {},
-  logs: {}
+  logs: {},
+  about: {}
 };
 
 let networkHandler = (handler) =>
@@ -68,6 +70,19 @@ let responses = {
     }
   }),
 
+  [FETCH_SERVER_ABOUT]: networkHandler((state, action) => {
+    switch(action.network) {
+    case NETWORK_STATE_REQUESTING:
+    case NETWORK_STATE_FAILURE:
+      return _(state).clone();
+    case NETWORK_STATE_SUCCESS:
+      let newState = _(state).clone();
+      newState.about = action.responseBody;
+      return newState;
+    default:
+      return state;
+    }
+  }),
 
   '@@redux/INIT': identity,
   default: identity
