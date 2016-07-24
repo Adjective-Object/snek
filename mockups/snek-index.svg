@@ -87,11 +87,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.56596325"
-     inkscape:cx="546.84152"
-     inkscape:cy="470.07117"
+     inkscape:zoom="1.6007858"
+     inkscape:cx="140.21269"
+     inkscape:cy="911.51193"
      inkscape:document-units="px"
-     inkscape:current-layer="layer5"
+     inkscape:current-layer="layer3"
      showgrid="true"
      inkscape:window-width="1366"
      inkscape:window-height="743"
@@ -110,7 +110,7 @@
      inkscape:snap-grids="true"
      inkscape:snap-page="true"
      inkscape:snap-nodes="true"
-     inkscape:snap-global="false"
+     inkscape:snap-global="true"
      inkscape:object-paths="true"
      showguides="true"
      inkscape:guide-bbox="true">
@@ -133,7 +133,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -584,7 +584,7 @@
        id="text7135"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         id="tspan7137"></tspan></text>
+         id="tspan7137" /></text>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Monaco;-inkscape-font-specification:Monaco"
@@ -593,7 +593,12 @@
        id="text7167"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         id="tspan7169"></tspan></text>
+         id="tspan7169" /></text>
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:0.6;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       d="m 72,48 72,0"
+       id="path4655"
+       inkscape:connector-curvature="0" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -1141,7 +1146,7 @@
          sodipodi:role="line"
          id="tspan7290"
          x="394.01852"
-         y="-23.27939">    </tspan></text>
+         y="-23.27939" /></text>
     <flowRoot
        xml:space="preserve"
        id="flowRoot7292"
@@ -1152,7 +1157,7 @@
            height="49.473175"
            x="387.83438"
            y="216.13545" /></flowRegion><flowPara
-         id="flowPara7298">  </flowPara></flowRoot>  </g>
+         id="flowPara7298" /></flowRoot>  </g>
   <g
      inkscape:groupmode="layer"
      id="layer7"
