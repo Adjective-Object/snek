@@ -132,6 +132,7 @@ class Build(object):
                 cwd=self.repo_path)
 
         if exitcode:
+            print 'fuck'
             return exitcode
 
         # split on repeated spaces, remove empty strings, take every other
