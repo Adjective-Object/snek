@@ -23,8 +23,6 @@ class FsStore(object):
             self.db[attr] = {}
             self.db.sync()
 
-        print self.db
-
 
     # check if handle exists already
     def exists(self, handle):
@@ -65,9 +63,7 @@ class FsBuildLog(FsStore):
 
     # initialize a log entry
     def init(self, handle):
-        print('init log' , handle)
         self.update([handle], {})
-        print(self.db)
         self.db.sync()
 
     # append text to a section of the log entry

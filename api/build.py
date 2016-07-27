@@ -2,6 +2,8 @@ from log import log, status
 import subprocess, threading, os, time, re
 from config import config
 from util import mkdir_p
+import base64
+from hashlib import md5
 
 ongoing_builds = set()
 
@@ -108,7 +110,6 @@ class Build(object):
 
     def build_step_check_revision(self):
         def assign_repo(out, err):
-            print out.split(' ', 1)
             self.build_hash, self.commit_msg = out.split(' ', 1)
             status.set_build_git_info(
                 self.repo_id,
@@ -132,7 +133,6 @@ class Build(object):
                 cwd=self.repo_path)
 
         if exitcode:
-            print 'fuck'
             return exitcode
 
         # split on repeated spaces, remove empty strings, take every other
@@ -181,7 +181,13 @@ class Build(object):
 
     def build(self):
         self.build_time = int(time.time())
-        self.handle = "%s-%s" % (self.repo_id, self.build_time)
+
+
+        self.handle = base64.urlsafe_b64encode(
+                md5("%s%s" % (self.repo_id, self.build_time)).digest())[0:8]
+        while status.exists(self.handle):
+            self.handle = base64.urlsafe_b64encode(
+                    md5("%s%s" % (self.repo_id, self.build_time)).digest())[0:8]
 
         # add an entry for this specific build to the log
         log.init(self.handle);
