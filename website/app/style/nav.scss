@@ -1,0 +1,48 @@
+@import 'colors.scss';
+
+#site-nav {
+    background-color: $nav-bg;
+    color: $nav-fg;
+
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+
+    width: 240px;
+    overflow-y: auto;
+
+    a {
+        padding: 24px;
+        transition: background-color $time-trans-fast;
+        display: block;
+        width: 100%;
+
+        color: inherit;
+        text-decoration: none;
+
+    }
+    a.active {
+        background-color: $nav-bg-highlight;
+    }
+
+    a[href='/'] {
+        color: #084C46;
+        font-size: 2em;
+
+        &:after{ display: none; }
+
+        width: 100%;
+
+    }
+
+    a[href='/about'] {
+        margin-top: auto;
+        margin-bottom: 0;
+    }
+
+    hr {
+        border: none;
+        outline: none;
+        height: 1em;
+    }
+}

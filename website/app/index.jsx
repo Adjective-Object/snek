@@ -11,6 +11,8 @@ import AboutPage from './components/AboutPage';
 import RepoPage from './components/RepoPage/RepoPage';
 import RepoListPage from './components/RepoListPage';
 
+import SiteNavigation from './components/SiteNavigation';
+
 
 import snekApp, { defaultState } from './reducers/snekApp';
 import { createStore, applyMiddleware } from 'redux';
@@ -20,7 +22,7 @@ import createLogger from 'redux-logger';
 
 import './style/index.scss';
 import * as types from './types';
-import { sliceAtNth } from './util';
+import { sliceAtNth, tryPath } from './util';
 import * as actions from './actions/actions';
 
 const loggerMiddleware = createLogger();
@@ -46,52 +48,28 @@ class _App extends Component {
       direction: 'down'
     };
 
-    this._figureOrder = this._figureOrder.bind(this);
   }
 
-  _figureOrder(evt) {
-    let clickedElement = evt.nativeEvent.target;
-    let activeElement =
-      document.querySelector('#site-nav .active');
-
-    if (activeElement &&
-        (document.DOCUMENT_POSITION_PRECEDING &
-         activeElement.compareDocumentPosition(clickedElement))) {
-      this.setState({direction: 'up'});
-    } else {
-      this.setState({direction: 'down'});
-    }
+  getChildContext() {
+    return {
+      pageLocation: {
+        repoId: this.props.selectedRepoId,
+        buildId: this.props.selectedBuildId,
+        packageId: this.props.selectedPackageId
+      }
+    };
   }
+
 
   render() {
-    let repoLinks = [];
-    for (let key in this.props.repos) {
-      repoLinks.push(
-        <Link activeClassName="active"
-              to={'/repos/' + key}
-              key={key}
-              onClick={this._figureOrder}>
-          {this.props.repos[key].name}
-        </Link>
-      );
-    }
 
     return (
       <div id="app-root">
-        <nav id="site-nav">
-          <Link to="/"
-                onClick={this._figureOrder}
-                >
-                Snek
-          </Link>
-          {repoLinks}
-          <Link activeClassName="active"
-                to="/about"
-                onClick={this._figureOrder}
-                >
-                About
-          </Link>
-        </nav>
+        <SiteNavigation 
+            upCallback ={ () => this.setState({direction: 'up'})}
+            downCallback ={ () => this.setState({direction: 'down'})}
+            repos={ this.props.repos }
+          />
 
         <ReactCSSTransitionGroup
           component="div"
@@ -110,16 +88,40 @@ class _App extends Component {
 }
 _App.propTypes = {
   repos: React.PropTypes.objectOf(types.repo),
-  children: React.PropTypes.object
+  children: React.PropTypes.object,
+  selectedBuildId: React.PropTypes.string,
+  selectedPackageId: React.PropTypes.string,
+  selectedRepoId: React.PropTypes.string
 };
+_App.childContextTypes = {
+  pageLocation: types.pageLocation
+}
 
 const App = connect(
-  state => {
+  (state, ownProps) => {
     return {
-      repos: state.repos
+      repos: state.repos,
+
+      selectedRepoId: tryPath(
+          ownProps.params,
+          [ 'repoId' ]
+        ),
+
+      selectedBuildId: tryPath(
+          ownProps.params,
+          [ 'buildId' ]
+        ),
+
+      selectedPackageId: tryPath(
+          ownProps.params,
+          [ 'packageId' ]
+        ),
+
     };
   })(_App);
 App.propTypes = _App.propTypes;
+App.childContextTypes = _App.childContextTypes;
+
 
 const Application = ({ children, location }) => {
   return (
@@ -161,6 +163,7 @@ Application.propTypes = {
   children: React.PropTypes.object,
   location: React.PropTypes.object
 };
+
 
 setTimeout(() => {
   store.dispatch(actions.fetchRepoList());

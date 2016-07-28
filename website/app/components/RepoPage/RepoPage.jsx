@@ -15,16 +15,6 @@ import * as types from '../../types';
 
 
 class _RepoPage extends Component {
-  getChildContext() {
-    return {
-      pageLocation: {
-        repoId: this.props.selectedRepoId,
-        buildId: this.props.selectedBuildId,
-        packageId: this.props.selectedPackageId
-      }
-    };
-  }
-
   render() {
     if (this.props.repo) {
       // render repo if it exists
@@ -83,14 +73,8 @@ _RepoPage.propTypes = {
   repo: types.repo,
   networkStateRepoList: React.PropTypes.string,
   repoDetails: types.repoDetails,
-  selectedBuildId: React.PropTypes.string,
-  selectedPackageId: React.PropTypes.string,
-  selectedRepoId: React.PropTypes.string,
   // TODO type for this in types decl
   buildLog: React.PropTypes.object
-};
-_RepoPage.childContextTypes = {
-  pageLocation: React.PropTypes.object
 };
 
 let RepoPage = connect(
@@ -105,21 +89,6 @@ let RepoPage = connect(
                 state.details,
                 [ ownProps.params.repoId ]
                 ),
-
-        selectedRepoId: tryPath(
-            ownProps.params,
-            [ 'repoId' ]
-          ),
-
-        selectedBuildId: tryPath(
-            ownProps.params,
-            [ 'buildId' ]
-          ),
-
-        selectedPackageId: tryPath(
-            ownProps.params,
-            [ 'packageId' ]
-          ),
 
         buildLog: tryPath(
           state.logs,

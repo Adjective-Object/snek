@@ -34,7 +34,7 @@ class FsStore(object):
 
     # list the things
     def list(self):
-        return self.db.keys()
+        return self.db['logs'].keys()
 
     def update(self, path, value, 
             default=None,

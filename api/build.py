@@ -253,4 +253,5 @@ class Build(object):
     #######################
 
     def get_package_statuses(self):
-        return log.content(self.handle)["packages"]
+        return status.content(self.repo_id)['log_entries'][self.handle]['package_status']
+
