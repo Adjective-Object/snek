@@ -1,5 +1,5 @@
 import * as types from '../types';
-import React from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router';
 
 const figureOrder = (evt, upCallback, downCallback) => {
@@ -15,35 +15,32 @@ const figureOrder = (evt, upCallback, downCallback) => {
   }
 };
 
-const SiteNavigation = (props, context) => {
-  let repoLinks = [];
-  for (let key in props.repos) {
-    let currentActive = 'base';
-    if (context.router.isActive('/repos/' + key + '/health', true)) {
-      currentActive = 'health';
-    } else if (context.router.isActive('/repos/' + key + '/config', true)) {
-      currentActive = 'config';
-    }
+class RepoListEntry extends Component {
+  setActive(isActive) {
+    this.refs.container.classList.toggle('active', isActive);
+  }
 
-
-    repoLinks.push(
-        <section
-          className = {
-            'repository ' +
-            (context.pageLocation.repoId === key ? ' active' : '') }
-          key={key}
-          >
+  render() {
+    return (
+      <section
+        ref="container"
+        className = {
+          'repository ' +
+          (this.props.active ? ' active' : '') }
+        id={this.props.repoId}
+        >
+        <section className="content">
 
           {/* Primary nav (repo) */}
           <Link className="repo-name"
-                to={'/repos/' + key}
-                onClick={(evt) =>
-                  figureOrder(evt, props.upCallback, props.downCallback)}>
-            {props.repos[key].name}
+                to={'/repos/' + this.props.repoId}
+                onClick={(e) => this.props.onClick(e, this.props.repoId)}
+                >
+            {this.props.repoName}
           </Link>
 
           {/* subnav */}
-          <section className={ 'details' + (' location-' + currentActive)}>
+          <section className={ 'details' + (' location-' + this.props.sublocation)}>
             {/* health indicator */}
             <aside className="repo-health-indicator">
               <i className="success" style={{flexGrow: 1}} data-pkg-count={1}/>
@@ -51,26 +48,81 @@ const SiteNavigation = (props, context) => {
               <i className="failure" style={{flexGrow: 3}} data-pkg-count={3}/>
             </aside>
 
-            <Link className="build-log-link"
-                  to={'/repos/' + key }>
-              Build Log
-            </Link>
-            <Link className="repo-health-link"
-                  to={'/repos/' + key + '/health'}
-                >
-                Repository Health
-            </Link>
-            <Link className="configuration-link"
-                  to={'/repos/' + key + '/config'}
-                >
-                Configuration
-            </Link>
+            <section className="subnav">
+              <Link className="build-log-link"
+                    to={'/repos/' + this.props.repoId }>
+                Build Log
+              </Link>
+              <Link className="repo-health-link"
+                    to={'/repos/' + this.props.repoId + '/health'}
+                  >
+                  Repository Health
+              </Link>
+              <Link className="configuration-link"
+                    to={'/repos/' + this.props.repoId + '/config'}
+                  >
+                  Configuration
+              </Link>
+            </section>
           </section>
         </section>
-      );
+      </section>
+    );
+  }
+}
+
+RepoListEntry.propTypes = {
+  ref: React.PropTypes.string,
+  active: React.PropTypes.boolean,
+  repoId: React.PropTypes.string,
+  repoName: React.PropTypes.string,
+  sublocation: React.PropTypes.string,
+  upCallback: React.PropTypes.func,
+  downCallback: React.PropTypes.func,
+  onClick: React.PropTypes.func
+};
+
+class SiteNavigation extends Component {
+
+  _repoSelected(evt, id) {
+    figureOrder(evt, this.props.upCallback, this.props.downCallback);
+
+    for (let repoId in this.refs) {
+      this.refs[repoId].setActive(repoId === id);
+    }
   }
 
-  return(
+  shouldComponentUpdate(nextProps, nextState) {
+    return Object.keys(this.props.repos).length !== Object.keys(nextProps.repos).length;
+  }
+
+  render() {
+    // build entries
+    let repoLinks = [];
+    for (let key in this.props.repos) {
+      let currentActive = 'base';
+      if (this.context.router.isActive('/repos/' + key + '/health', true)) {
+        currentActive = 'health';
+      } else if (this.context.router.isActive('/repos/' + key + '/config', true)) {
+        currentActive = 'config';
+      }
+      repoLinks.push(
+        <RepoListEntry
+          ref={key}
+          active={this.context.pageLocation.repoId === key}
+          repoId={key}
+          key={key}
+          repoName={this.props.repos[key].name}
+          sublocation={currentActive}
+          upCallback={this.props.upCallback}
+          downCallback={this.props.downCallback}
+          onClick={this._repoSelected.bind(this)}
+          />
+      );
+    }
+
+    // render in container
+    return (
       <nav id="site-nav">
         <section className="repositories">
           {repoLinks}
@@ -81,7 +133,9 @@ const SiteNavigation = (props, context) => {
         </section>
       </nav>
     );
-};
+  }
+
+}
 SiteNavigation.propTypes = {
   repos: React.PropTypes.objectOf(types.repo),
   upCallback: React.PropTypes.func,

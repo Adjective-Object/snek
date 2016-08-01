@@ -27,65 +27,126 @@
     flex-direction: column;
 }
 
+
+.permalinks {
+    font-family: 'Montserrat', sans-serif;
+    font-style: italic;
+    font-size: 12px;
+    flex-grow: 0;
+    padding: 24px;
+
+
+    a {
+        opacity: 0.5;
+        transition: opacity 0.5s;
+
+        &:not(:last-child) {
+            margin-bottom: 12px;
+        }
+        &.active, &:hover {
+            opacity: 1;
+        }
+    }
+}
+
+
+
+
 #site-nav .repository {
-    $sublink-height: 18px + 12px;
     $health-indicator-height: 27px;
     $health-indicator-margin: 9px;
     $indicator-link-spacing: 24px;
 
-    padding: 24px;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    &:first-child {
-        padding-top: 24px
-    }
-    &:last-child {
-        padding-bottom: 24px
+    $indentation: 42px;
+    $indicator-channel: 30px;
+
+    $sublink-height: 18px + 12px;
+
+    $padding-active: 24px;
+    $padding-inactive: 12px;
+
+    $title-height: 24px;
+
+    $inner-height-inactive:
+        $title-height +
+        $health-indicator-height;
+    $inner-height-active:
+        $inner-height-inactive +
+        $indicator-link-spacing +
+        $sublink-height * 3;
+
+    &:not(.active) {
+        height: $inner-height-inactive + 2 * $padding-inactive;
+        .content {
+            transform: translate(0, $padding-inactive);
+            height: $inner-height-inactive;
+        }
     }
 
-    transition: background-color $time-trans-fast, padding $time-trans-fast;
+    &.active {
+        height: $inner-height-active + 2 * $padding-active;
+        .content {
+            transform: translate(0, $padding-active);
+            height: $inner-height-active;
+        }
+    }
+
+    will-change: height;
+
+    .content {
+        overflow: hidden;
+        transition: 
+            transform $time-trans-slow,
+            height $time-trans-slow;
+    }
+
+    padding-left: $padding-active;
+    padding-right: $padding-active;
+
+    transition: 
+        background-color $time-trans-slow,
+        height $time-trans-slow;
+    
+
     display: block;
     width: 100%;
     position: relative;
 
-    $indentation: 42px;
-    $indicator-channel: 30px;
 
-    will-change: height, padding;
+    .repo-name {
+        height: $title-height;
+    }
 
     .details {
         display: block;
         overflow: hidden;
         position: relative;
 
+        .subnav {
+            opacity: 0;
+            transition: opacity $time-trans-slow;
+        }
+
         a {
             font-size: 12px;
             font-family: 'Montserrat Light';
             height: $sublink-height;
-            opacity: 0;
-            transition: opacity $time-trans-fast;
         }
 
         height: 3 * $sublink-height + $health-indicator-height + $indicator-link-spacing;
         margin-left: $indentation - $indicator-channel;
         padding-left: $indicator-channel;
-
-        transition: height $time-trans-fast;
-
-        will-change: height;
     }
 
 
     &.active {
-        padding: 24px;
         background-color: $nav-bg-highlight;
-        a {
+        .subnav {
             opacity: 1;
         }
     }
 
     &:not(.active) .details {
-        height: $health-indicator-height;
     }
 
     .repo-health-indicator {
@@ -120,7 +181,7 @@
 
         top: 0;
         left: 0;
-        transition: transform $trans-time-med;
+        transition: transform $time-trans-slow;
     }
 
     &:not(.active) .details::before {
@@ -143,24 +204,3 @@
     }
 
 }
-
-.permalinks {
-    font-family: 'Montserrat', sans-serif;
-    font-style: italic;
-    font-size: 12px;
-    flex-grow: 0;
-    padding: 24px;
-}
-
-.permalinks a {
-    opacity: 0.5;
-    transition: opacity 0.5s;
-
-    &:not(:last-child) {
-        margin-bottom: 12px;
-    }
-    &.active, &:hover {
-        opacity: 1;
-    }
-}
-
