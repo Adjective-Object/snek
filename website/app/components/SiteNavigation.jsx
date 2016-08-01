@@ -72,7 +72,13 @@ const SiteNavigation = (props, context) => {
 
   return(
       <nav id="site-nav">
-        {repoLinks}
+        <section className="repositories">
+          {repoLinks}
+        </section>
+        <section className="permalinks">
+          <Link to="/docs" activeClassName="active">documentation</Link>
+          <Link to="/about" activeClassName="active">about snek</Link>
+        </section>
       </nav>
     );
 };

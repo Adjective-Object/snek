@@ -5,7 +5,7 @@
     color: $nav-fg;
 
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     flex-direction: column;
 
     width: 240px;
@@ -18,7 +18,13 @@
     }
 
 
-    will-change: contents;
+}
+
+.repositories {
+    flex-grow: 1;
+    align-items: flex-start;
+    justify-content: stretch;
+    flex-direction: column;
 }
 
 #site-nav .repository {
@@ -136,5 +142,25 @@
         }
     }
 
-
 }
+
+.permalinks {
+    font-family: 'Montserrat', sans-serif;
+    font-style: italic;
+    font-size: 12px;
+    flex-grow: 0;
+    padding: 24px;
+}
+
+.permalinks a {
+    opacity: 0.5;
+    transition: opacity 0.5s;
+
+    &:not(:last-child) {
+        margin-bottom: 12px;
+    }
+    &.active, &:hover {
+        opacity: 1;
+    }
+}
+
