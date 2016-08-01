@@ -1,5 +1,6 @@
 var webpack = require('webpack');
 var path = require('path');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
 	entry: [
@@ -26,7 +27,10 @@ module.exports = {
             {
                 test: /(\.scss?|\.scss?)$/,
                 exclude: /(node_modules|bower_components)/,
-                loaders: ["style", "css?sourceMap", "sass?sourceMap"]
+                loader: ExtractTextPlugin.extract(
+                    "style",
+                    "css?sourceMap!sass?sourceMap"
+                )
             },
             {
             	test: /\.md$/,
@@ -43,5 +47,6 @@ module.exports = {
     devtool: "#inline-source-map",
     plugins: [
 		new webpack.NoErrorsPlugin(),
+        new ExtractTextPlugin("bundle.css", { allChunks: true })
 	]
 };

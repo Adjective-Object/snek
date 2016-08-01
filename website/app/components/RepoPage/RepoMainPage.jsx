@@ -43,7 +43,7 @@ RepoMainPage.propTypes = {
   buildLog: React.PropTypes.object
 };
 RepoMainPage.contextTypes = {
-    pageLocation: types.pageLocation
-}
+  pageLocation: types.pageLocation
+};
 
 export default RepoMainPage;

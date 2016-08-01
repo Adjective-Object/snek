@@ -12,37 +12,129 @@
     overflow-y: auto;
 
     a {
-        padding: 24px;
-        transition: background-color $time-trans-fast;
-        display: block;
-        width: 100%;
-
         color: inherit;
         text-decoration: none;
-
+        display: block;
     }
-    a.active {
+
+
+    will-change: contents;
+}
+
+#site-nav .repository {
+    $sublink-height: 18px + 12px;
+    $health-indicator-height: 27px;
+    $health-indicator-margin: 9px;
+    $indicator-link-spacing: 24px;
+
+    padding: 24px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    &:first-child {
+        padding-top: 24px
+    }
+    &:last-child {
+        padding-bottom: 24px
+    }
+
+    transition: background-color $time-trans-fast, padding $time-trans-fast;
+    display: block;
+    width: 100%;
+    position: relative;
+
+    $indentation: 42px;
+    $indicator-channel: 30px;
+
+    will-change: height, padding;
+
+    .details {
+        display: block;
+        overflow: hidden;
+        position: relative;
+
+        a {
+            font-size: 12px;
+            font-family: 'Montserrat Light';
+            height: $sublink-height;
+            opacity: 0;
+            transition: opacity $time-trans-fast;
+        }
+
+        height: 3 * $sublink-height + $health-indicator-height + $indicator-link-spacing;
+        margin-left: $indentation - $indicator-channel;
+        padding-left: $indicator-channel;
+
+        transition: height $time-trans-fast;
+
+        will-change: height;
+    }
+
+
+    &.active {
+        padding: 24px;
         background-color: $nav-bg-highlight;
+        a {
+            opacity: 1;
+        }
     }
 
-    a[href='/'] {
-        color: #084C46;
-        font-size: 2em;
+    &:not(.active) .details {
+        height: $health-indicator-height;
+    }
 
-        &:after{ display: none; }
+    .repo-health-indicator {
+        margin-top: $health-indicator-margin;
+        margin-bottom: $health-indicator-margin + $indicator-link-spacing;
+        height: $health-indicator-height - $health-indicator-margin * 2;
 
-        width: 100%;
+        border-radius: 4.5px;
+        overflow: hidden;
+
+        display: flex;
+    }
+
+    .repo-health-indicator i {
+        &.success { background-color: $status-success; }
+        &.ongoing { background-color: $status-ongoing; }
+        &.failure { background-color: $status-failure; }
 
     }
 
-    a[href='/about'] {
-        margin-top: auto;
-        margin-bottom: 0;
+    .details::before {
+        content: "";
+        display: block;
+        position: absolute;
+        width: $indicator-channel;
+        height: 12px;
+
+        background-image: url(/static/images/chevron.svg);
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        top: 0;
+        left: 0;
+        transition: transform $trans-time-med;
     }
 
-    hr {
-        border: none;
-        outline: none;
-        height: 1em;
+    &:not(.active) .details::before {
+        transform: translate(0, $health-indicator-margin - 3px) rotate(90deg);
     }
+
+
+    $first-link: $health-indicator-height + $indicator-link-spacing + 2px;
+
+    &.active {
+        .details.location-base::before {
+            transform: translate(0, $first-link);
+        }
+        .details.location-health::before {
+            transform: translate(0, $first-link + $sublink-height);
+        }
+        .details.location-config::before {
+            transform: translate(0, $first-link + $sublink-height * 2);
+        }
+    }
+
+
 }

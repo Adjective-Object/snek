@@ -3,13 +3,12 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { render } from 'react-dom';
 import {
     browserHistory, Router, Route,
-    IndexRoute, Link
+    IndexRoute
 } from 'react-router';
 
 import IndexPage from './components/IndexPage/IndexPage';
 import AboutPage from './components/AboutPage';
 import RepoPage from './components/RepoPage/RepoPage';
-import RepoListPage from './components/RepoListPage';
 
 import SiteNavigation from './components/SiteNavigation';
 
@@ -47,25 +46,24 @@ class _App extends Component {
     this.state = {
       direction: 'down'
     };
-
   }
 
   getChildContext() {
     return {
       pageLocation: {
-        repoId: this.props.selectedRepoId,
-        buildId: this.props.selectedBuildId,
-        packageId: this.props.selectedPackageId
+        repoId: this.props.repoId,
+        buildId: this.props.buildId,
+        packageId: this.props.packageId,
+        subpageId: this.props.subpageId
       }
     };
   }
 
 
   render() {
-
     return (
       <div id="app-root">
-        <SiteNavigation 
+        <SiteNavigation
             upCallback ={ () => this.setState({direction: 'up'})}
             downCallback ={ () => this.setState({direction: 'down'})}
             repos={ this.props.repos }
@@ -79,7 +77,7 @@ class _App extends Component {
           transitionLeaveTimeout={300}
         >
           {React.cloneElement(this.props.children, {
-            key: sliceAtNth(location.pathname, '/', 3)
+            key: () => sliceAtNth(location.pathname, '/', 3)
           })}
         </ReactCSSTransitionGroup>
       </div>
@@ -89,72 +87,94 @@ class _App extends Component {
 _App.propTypes = {
   repos: React.PropTypes.objectOf(types.repo),
   children: React.PropTypes.object,
-  selectedBuildId: React.PropTypes.string,
-  selectedPackageId: React.PropTypes.string,
-  selectedRepoId: React.PropTypes.string
+  buildId: React.PropTypes.string,
+  packageId: React.PropTypes.string,
+  repoId: React.PropTypes.string,
+  subpageId: React.PropTypes.string
 };
 _App.childContextTypes = {
   pageLocation: types.pageLocation
-}
+};
 
 const App = connect(
   (state, ownProps) => {
     return {
       repos: state.repos,
 
-      selectedRepoId: tryPath(
+      repoId: tryPath(
           ownProps.params,
           [ 'repoId' ]
         ),
 
-      selectedBuildId: tryPath(
+      buildId: tryPath(
           ownProps.params,
           [ 'buildId' ]
         ),
 
-      selectedPackageId: tryPath(
+      packageId: tryPath(
           ownProps.params,
           [ 'packageId' ]
         ),
+
+      subpageId: tryPath(
+        ownProps,
+        [ 'subpageId' ]
+      )
+
 
     };
   })(_App);
 App.propTypes = _App.propTypes;
 App.childContextTypes = _App.childContextTypes;
 
-
 const Application = ({ children, location }) => {
   return (
     <Router history={browserHistory}>
       <Route path="/" component={App}>
-        <IndexRoute component={IndexPage}
-                onEnter={ (nextState) => {
-                  store.dispatch(actions.fetchServerAbout());
-                }}
-
-        />
-        <Route path="repos" component={RepoListPage}
-                onEnter={ (nextState) => {
-                  store.dispatch(
-                    actions.fetchRepoList()
-                  );
-                }} />
-        <Route path="repos/:repoId" component={RepoPage}
-                onEnter={ (nextState) =>
-                  store.dispatch(
-                    actions.fetchRepoDetails(nextState.params.repoId)
-                  )
-                }>
-          <Route path=":buildId" component={RepoPage}
-                onEnter={ (nextState) =>
-                  store.dispatch(
-                    actions.fetchBuildLog(nextState.params.buildId)
-                  )
-                }>
-            <Route path=":packageId" component={RepoPage}/>
-          </Route>
-        </Route>
-        <Route path="about" component={AboutPage} />
+        <IndexRoute
+          component={IndexPage}
+          onEnter={
+            (nextState) => store.dispatch(actions.fetchServerAbout())
+          }
+          />
+        <Route path="/about"
+               component={AboutPage}/>
+        <Route path="/repos/:repoId/health"
+                component={RepoPage}
+                // onEnter={
+                //   (nextState) => {
+                //     store.dispatch(
+                //       actions.fetchRepoDetails(nextState.params.repoId)
+                //     )
+                //   }
+                // }
+                />
+        <Route path="/repos/:repoId/config"
+                component={RepoPage}
+                // onEnter={
+                //   (nextState) => {
+                //     store.dispatch(
+                //       actions.fetchRepoDetails(nextState.params.repoId)
+                //     )
+                //   }
+                // }
+                />
+        <Route path="/repos/:repoId(/:buildId(/:packageId))"
+                component={RepoPage}
+                subpageId="repo"
+                onEnter={
+                  (nextState) => {
+                    if (nextState.params.repoId) {
+                      store.dispatch(
+                        actions.fetchRepoDetails(nextState.params.repoId)
+                      );
+                    } else if (nextState.params.buildId) {
+                      store.dispatch(
+                        actions.fetchBuildLog(nextState.params.repoId)
+                      );
+                    }
+                  }
+                }/>
       </Route>
     </Router>
   );

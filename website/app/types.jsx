@@ -31,7 +31,8 @@ export let repoDetails = shape({
 export let pageLocation = shape({
   repoId: React.PropTypes.string,
   buildId: React.PropTypes.string,
-  packageId: React.PropTypes.string
+  packageId: React.PropTypes.string,
+  subpageId: React.PropTypes.string
 });
 
 /* eslint-enable camelcase */

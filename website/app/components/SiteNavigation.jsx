@@ -9,42 +9,81 @@ const figureOrder = (evt, upCallback, downCallback) => {
   if (activeElement &&
       (document.DOCUMENT_POSITION_PRECEDING &
        activeElement.compareDocumentPosition(clickedElement))) {
-    upCallback()
+    upCallback();
   } else {
-    downCallback()
+    downCallback();
   }
-}
+};
 
 const SiteNavigation = (props, context) => {
-    let repoLinks = [];
-    for (let key in props.repos) {
-      repoLinks.push(
-        <div 
-          className = { context.pageLocation.repo === key ? 'active' : null }
+  let repoLinks = [];
+  for (let key in props.repos) {
+    let currentActive = 'base';
+    if (context.router.isActive('/repos/' + key + '/health', true)) {
+      currentActive = 'health';
+    } else if (context.router.isActive('/repos/' + key + '/config', true)) {
+      currentActive = 'config';
+    }
+
+
+    repoLinks.push(
+        <section
+          className = {
+            'repository ' +
+            (context.pageLocation.repoId === key ? ' active' : '') }
           key={key}
           >
-          <Link activeClassName="active"
+
+          {/* Primary nav (repo) */}
+          <Link className="repo-name"
                 to={'/repos/' + key}
-                onClick={(evt) => 
+                onClick={(evt) =>
                   figureOrder(evt, props.upCallback, props.downCallback)}>
             {props.repos[key].name}
           </Link>
-        </div>
-      );
-    }
 
-    return(
+          {/* subnav */}
+          <section className={ 'details' + (' location-' + currentActive)}>
+            {/* health indicator */}
+            <aside className="repo-health-indicator">
+              <i className="success" style={{flexGrow: 1}} data-pkg-count={1}/>
+              <i className="ongoing" style={{flexGrow: 2}} data-pkg-count={2}/>
+              <i className="failure" style={{flexGrow: 3}} data-pkg-count={3}/>
+            </aside>
+
+            <Link className="build-log-link"
+                  to={'/repos/' + key }>
+              Build Log
+            </Link>
+            <Link className="repo-health-link"
+                  to={'/repos/' + key + '/health'}
+                >
+                Repository Health
+            </Link>
+            <Link className="configuration-link"
+                  to={'/repos/' + key + '/config'}
+                >
+                Configuration
+            </Link>
+          </section>
+        </section>
+      );
+  }
+
+  return(
       <nav id="site-nav">
         {repoLinks}
       </nav>
-    );ind
-}
+    );
+};
 SiteNavigation.propTypes = {
+  repos: React.PropTypes.objectOf(types.repo),
   upCallback: React.PropTypes.func,
   downCallback: React.PropTypes.func
-}
+};
 SiteNavigation.contextTypes = {
-  pageLocation: types.pageLocation
-}
+  pageLocation: types.pageLocation,
+  router: React.PropTypes.object
+};
 
-export default SiteNavigation
+export default SiteNavigation;
