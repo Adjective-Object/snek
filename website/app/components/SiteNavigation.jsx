@@ -72,7 +72,6 @@ class RepoListEntry extends Component {
 }
 
 RepoListEntry.propTypes = {
-  ref: React.PropTypes.string,
   active: React.PropTypes.boolean,
   repoId: React.PropTypes.string,
   repoName: React.PropTypes.string,
@@ -82,12 +81,15 @@ RepoListEntry.propTypes = {
   onClick: React.PropTypes.func
 };
 
+
 class SiteNavigation extends Component {
 
   _repoSelected(evt, id) {
     figureOrder(evt, this.props.upCallback, this.props.downCallback);
 
+    console.log('_repoSelected on', id);
     for (let repoId in this.refs) {
+      console.log(repoId, id);
       this.refs[repoId].setActive(repoId === id);
     }
   }

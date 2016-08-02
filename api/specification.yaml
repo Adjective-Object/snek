@@ -1,0 +1,355 @@
+swagger: '2.0'
+basePath: '/api'
+info:
+  version: 0.0.1
+  title: Snek Api
+  description: >
+    Api for managing builds on a snek server.
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /about:
+    get:
+      description: Returns metadata about the server
+      tags: 
+        - Server Information
+      responses:
+        '200': 
+          description: Server metadata
+          schema:
+            $ref: '#/definitions/server-about'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/error'
+
+  '/repos':
+    get:
+      tags: 
+        - Repos
+      description: Returns the list of repos tracked by this server
+      responses:
+        '200': 
+          description: list of repos
+          schema:
+            title: repo-overview-list
+            type: array
+            items:
+              $ref: '#/definitions/repo-overview'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/error'
+
+  '/repos/{repo-id}':
+    get:
+      tags: 
+        - Repos
+      parameters:
+        - name: repo-id
+          type: string
+          in: path
+          description: the repo to query
+          required: true
+
+      description: Returns information about the specified repo
+      responses:
+        '200': 
+          description: Repo information
+          schema:
+            $ref: '#/definitions/repo-status'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/error'
+
+  '/builds':
+    get:
+      tags: 
+        - Builds
+      description: Returns a list of the build ids that have happened on this server
+      responses:
+        '200':
+          description: An array of build ids
+          schema:
+            type: array
+            items:
+              type: string
+              description: id of a build
+
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/error'
+
+    post:
+      tags: 
+        - Builds
+      description: Request a new build on the server
+      responses:
+        '200':
+          description: Status of the new build
+          schema:
+            type: array
+            items:
+              type: string
+
+        '503':
+          description: Build for this repository is already in progress
+          schema:
+            $ref: '#/definitions/error'
+
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/error'
+
+  '/builds/{build-id}':
+    get:
+      tags: 
+        - Builds
+      description: Returns status information on packages in the requested build
+      parameters:
+        - name: build-id
+          type: string
+          in: path
+          description: the build to get the status for
+          required: true
+      responses:
+        '200':
+          description: List of packages
+          schema:
+            $ref: '#/definitions/build-status'
+
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/error'
+
+  '/builds/{build-id}/{package-id}':
+    get:
+      tags: 
+        - Builds
+      description: Returns build logs for the specified package
+      parameters:
+        - name: build-id
+          type: string
+          in: path
+          description: the build to get logs for
+          required: true
+
+        - name: package-id
+          type: string
+          in: path
+          description: the package to get logs for within the build
+          required: true
+
+      responses:
+        '200':
+          description: List of packages
+          schema:
+            $ref: '#/definitions/package-status'
+
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/error'
+
+  # TODO figure this out
+  '/hooks/github':
+    post:
+      tags: 
+        - Hooks & Integrations
+      description: Starts a build. Similar to POST /builds.
+
+      responses:
+        '200':
+          description: Build Started
+          schema:
+            $ref: '#/definitions/package-status'
+
+        '503':
+          description: Build for this repository is already in progress
+          schema:
+            $ref: '#/definitions/error'
+
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/error'
+
+
+
+
+
+
+definitions:
+
+  ############
+  ## SERVER ##
+  ############
+
+  server-about:
+    required:
+      - name
+      - motd
+      - status
+    properties:
+      name:
+        type: string
+      motd: 
+        type: string
+        description: message of the day
+      status:
+        $ref: '#/definitions/server-status'
+
+
+  server-status:
+    required:
+      - state
+      - message
+    properties:
+      state:
+        type: string
+        enum:
+          - good
+          - broken
+          - setup
+      message:
+        type: string
+
+  ############
+  ## REPOS ##
+  ############
+
+  repo-overview:
+    required:
+      - url
+      - name
+    properties:
+      url: 
+        description: git url of the repository was fetched from
+        type: string
+      name:
+        description: name of the repo
+        type: string
+      nixpkgs:
+        description: version of nixpkgs (by git hash) that this repo builds against
+        type: string
+
+  repo-status:
+    required:
+      - latest_build
+      - log_entries
+    properties:
+      latest_build:
+        description: id of the latest build
+        type: string
+      log_entries:
+        type: object
+        properties:
+          '<default>':
+            $ref: '#/definitions/build-brief-status'
+        additionalProperties:
+          $ref: '#/definitions/build-brief-status'
+
+  ############
+  ## BUILDS ##
+  ############
+
+  build-brief-status:
+    required:
+      - build_status
+      - git
+    properties:
+      build_status:
+        type: string
+        enum:
+          - success
+          - ongoing
+          - failure
+      git:
+        type: object
+        required:
+          - msg
+          - revision
+        properties:
+          msg:
+            description: some shit
+            type: string
+          revision:
+            type: string
+
+      packages:
+        type: object
+        properties:
+          '<default>':
+            $ref: '#/definitions/package-brief-status'
+        additionalProperties:
+          $ref: '#/definitions/package-brief-status'
+  
+  build-status:
+    required:
+      - build_id
+      - packages
+    properties:
+      build_id:
+        type: string
+      packages:
+        type: object
+        properties:
+          '<default>':
+            $ref: '#/definitions/package-brief-status'
+        additionalProperties:
+          $ref: '#/definitions/package-brief-status'
+
+  ##############
+  ## PACKAGES ##
+  ##############
+
+  package-brief-status:
+    required:
+      - status
+    properties:
+      status:
+        type: string
+        enum:
+        - success
+        - ongoing
+        - failure
+
+  package-status:
+    required: 
+      - build_id
+      - packages
+    properties:
+      build_id:
+        type: string
+      packages:
+        type: object
+        additionalProperties:
+          type: object
+          properties:
+            status:
+              type: string
+              enum:
+              - success
+              - ongoing
+              - failure
+
+  error:
+    required: 
+      - code
+      - message
+
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+

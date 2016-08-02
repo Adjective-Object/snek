@@ -77,7 +77,7 @@ class _App extends Component {
           transitionLeaveTimeout={300}
         >
           {React.cloneElement(this.props.children, {
-            key: () => sliceAtNth(location.pathname, '/', 3)
+            key: sliceAtNth(location.pathname, '/', 3)
           })}
         </ReactCSSTransitionGroup>
       </div>
