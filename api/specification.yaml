@@ -12,7 +12,8 @@ produces:
   - application/json
 
 paths:
-  /about:
+
+  '/about':
     get:
       description: Returns metadata about the server
       tags: 
@@ -55,13 +56,33 @@ paths:
           in: path
           description: the repo to query
           required: true
-
       description: Returns information about the specified repo
       responses:
         '200': 
           description: Repo information
           schema:
             $ref: '#/definitions/repo-status'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/error'
+
+  '/repos/{repo-id}/health':
+    get:
+      tags: 
+        - Repos 
+      parameters: 
+        - name: repo-id
+          type: string
+          in: path
+          description: the repo to get health for
+          required: true
+      description: Build health over time for the repo
+      responses:
+        '200': 
+          description: Repo health
+          schema:
+            $ref: '#/definitions/repo-health'
         default:
           description: unexpected error
           schema:
@@ -80,7 +101,6 @@ paths:
             items:
               type: string
               description: id of a build
-
         default:
           description: unexpected error
           schema:
@@ -97,12 +117,10 @@ paths:
             type: array
             items:
               type: string
-
         '503':
           description: Build for this repository is already in progress
           schema:
             $ref: '#/definitions/error'
-
         default:
           description: unexpected error
           schema:
@@ -124,7 +142,6 @@ paths:
           description: List of packages
           schema:
             $ref: '#/definitions/build-status'
-
         default:
           description: unexpected error
           schema:
@@ -141,19 +158,16 @@ paths:
           in: path
           description: the build to get logs for
           required: true
-
         - name: package-id
           type: string
           in: path
           description: the package to get logs for within the build
           required: true
-
       responses:
         '200':
           description: List of packages
           schema:
             $ref: '#/definitions/package-status'
-
         default:
           description: unexpected error
           schema:
@@ -165,25 +179,19 @@ paths:
       tags: 
         - Hooks & Integrations
       description: Starts a build. Similar to POST /builds.
-
       responses:
         '200':
           description: Build Started
           schema:
             $ref: '#/definitions/package-status'
-
         '503':
           description: Build for this repository is already in progress
           schema:
             $ref: '#/definitions/error'
-
         default:
           description: unexpected error
           schema:
             $ref: '#/definitions/error'
-
-
-
 
 
 
@@ -252,11 +260,24 @@ definitions:
       log_entries:
         type: object
         properties:
-          '<default>':
+          '<build_id>':
             $ref: '#/definitions/build-brief-status'
         additionalProperties:
           $ref: '#/definitions/build-brief-status'
 
+  repo-health:
+    required:
+      - builds
+    properties:
+      builds:
+        title: health-by-build
+        type: object
+        properties:
+          '<build-id>':
+            $ref: '#/definitions/build-health'
+        additionalProperties:
+          $ref: '#/definitions/build-health'
+    
   ############
   ## BUILDS ##
   ############
@@ -306,6 +327,29 @@ definitions:
             $ref: '#/definitions/package-brief-status'
         additionalProperties:
           $ref: '#/definitions/package-brief-status'
+
+  build-health:
+    required:
+      - success
+      - failure 
+      - newFailure 
+      - newSuccess 
+    properties:
+      success: 
+        type: integer
+      failure:
+        type: integer
+      newFailure:
+        $ref: '#/definitions/pkg-lst'
+      newSuccess: 
+        $ref: '#/definitions/pkg-lst'
+        
+  pkg-lst:
+    type: array
+    items:
+      title: 'package-name'
+      type: string
+
 
   ##############
   ## PACKAGES ##
